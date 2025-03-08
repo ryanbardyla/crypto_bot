@@ -1,0 +1,33 @@
+2025-03-08 02:57:11,858 - CryptoBotController - INFO - Checking component status
+2025-03-08 02:57:27,279 - CryptoBotController - INFO - Starting all components
+2025-03-08 02:57:27,279 - CryptoBotController - INFO - Starting component: youtube-tracker
+2025-03-08 02:57:27,279 - CryptoBotController - INFO - Component youtube-tracker started in background
+2025-03-08 02:57:27,279 - CryptoBotController - INFO - Starting component: twitter-collector
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Component twitter-collector started in background
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Starting component: sentiment-ml
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Component sentiment-ml started in background
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Starting component: alert-system
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Component alert-system started in background
+2025-03-08 02:57:27,280 - CryptoBotController - INFO - Starting component: paper-trader
+2025-03-08 02:57:27,281 - CryptoBotController - INFO - Component paper-trader started in background
+2025-03-08 02:57:27,281 - CryptoBotController - INFO - Starting component: dashboard
+2025-03-08 02:57:27,281 - CryptoBotController - INFO - Component dashboard started in background
+2025-03-08 02:57:27,281 - CryptoBotController - INFO - Starting component: performance-tracker
+2025-03-08 02:57:27,281 - CryptoBotController - INFO - Component performance-tracker started in background
+2025-03-08 02:57:27,282 - CryptoBotController - INFO - All components started
+2025-03-08 02:58:38,513 - CryptoBotController - INFO - Stopping all components
+2025-03-08 02:58:38,513 - CryptoBotController - INFO - Stopping component: youtube-tracker
+2025-03-08 02:58:38,537 - CryptoBotController - INFO - Component youtube-tracker stopped
+2025-03-08 02:58:38,537 - CryptoBotController - INFO - Stopping component: twitter-collector
+2025-03-08 02:58:38,560 - CryptoBotController - INFO - Component twitter-collector stopped
+2025-03-08 02:58:38,560 - CryptoBotController - INFO - Stopping component: sentiment-ml
+2025-03-08 02:58:38,581 - CryptoBotController - INFO - Component sentiment-ml stopped
+2025-03-08 02:58:38,581 - CryptoBotController - INFO - Stopping component: alert-system
+2025-03-08 02:58:38,603 - CryptoBotController - INFO - Component alert-system stopped
+2025-03-08 02:58:38,603 - CryptoBotController - INFO - Stopping component: paper-trader
+2025-03-08 02:58:38,625 - CryptoBotController - INFO - Component paper-trader stopped
+2025-03-08 02:58:38,625 - CryptoBotController - INFO - Stopping component: dashboard
+2025-03-08 02:58:38,647 - CryptoBotController - INFO - Component dashboard stopped
+2025-03-08 02:58:38,647 - CryptoBotController - INFO - Stopping component: performance-tracker
+2025-03-08 02:58:38,669 - CryptoBotController - INFO - Component performance-tracker stopped
+2025-03-08 02:58:38,669 - CryptoBotController - INFO - All components stopped

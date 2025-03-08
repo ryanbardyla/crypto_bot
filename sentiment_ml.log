@@ -1,0 +1,75 @@
+2025-03-08 02:57:28,394 - SentimentML - INFO - Configuration loaded successfully
+2025-03-08 02:57:28,402 - SentimentML - INFO - Database connection established
+2025-03-08 02:57:28,402 - SentimentML - INFO - Starting scheduled training with 7 day interval
+2025-03-08 02:57:28,402 - SentimentML - WARNING - Model files for BTC 1d not found
+2025-03-08 02:57:28,403 - SentimentML - INFO - Training new model for BTC 1d
+2025-03-08 02:57:28,403 - SentimentML - INFO - Training model for BTC with 1-day horizon
+2025-03-08 02:57:28,424 - SentimentML - INFO - Prepared training data for BTC: 0 samples
+2025-03-08 02:57:28,424 - SentimentML - WARNING - Not enough data to train model for BTC
+2025-03-08 02:57:28,425 - SentimentML - WARNING - Could not load or train model for BTC 1d
+2025-03-08 02:57:28,425 - SentimentML - WARNING - Model files for BTC 3d not found
+2025-03-08 02:57:28,425 - SentimentML - INFO - Training new model for BTC 3d
+2025-03-08 02:57:28,425 - SentimentML - INFO - Training model for BTC with 3-day horizon
+2025-03-08 02:57:28,438 - SentimentML - INFO - Prepared training data for BTC: 0 samples
+2025-03-08 02:57:28,438 - SentimentML - WARNING - Not enough data to train model for BTC
+2025-03-08 02:57:28,438 - SentimentML - WARNING - Could not load or train model for BTC 3d
+2025-03-08 02:57:28,438 - SentimentML - WARNING - Model files for BTC 7d not found
+2025-03-08 02:57:28,438 - SentimentML - INFO - Training new model for BTC 7d
+2025-03-08 02:57:28,438 - SentimentML - INFO - Training model for BTC with 7-day horizon
+2025-03-08 02:57:28,449 - SentimentML - INFO - Prepared training data for BTC: 0 samples
+2025-03-08 02:57:28,450 - SentimentML - WARNING - Not enough data to train model for BTC
+2025-03-08 02:57:28,450 - SentimentML - WARNING - Could not load or train model for BTC 7d
+2025-03-08 02:57:28,450 - SentimentML - WARNING - Model files for BTC 14d not found
+2025-03-08 02:57:28,450 - SentimentML - INFO - Training new model for BTC 14d
+2025-03-08 02:57:28,450 - SentimentML - INFO - Training model for BTC with 14-day horizon
+2025-03-08 02:57:28,463 - SentimentML - INFO - Prepared training data for BTC: 0 samples
+2025-03-08 02:57:28,463 - SentimentML - WARNING - Not enough data to train model for BTC
+2025-03-08 02:57:28,463 - SentimentML - WARNING - Could not load or train model for BTC 14d
+2025-03-08 02:57:28,463 - SentimentML - WARNING - Model files for ETH 1d not found
+2025-03-08 02:57:28,463 - SentimentML - INFO - Training new model for ETH 1d
+2025-03-08 02:57:28,463 - SentimentML - INFO - Training model for ETH with 1-day horizon
+2025-03-08 02:57:28,474 - SentimentML - INFO - Prepared training data for ETH: 0 samples
+2025-03-08 02:57:28,475 - SentimentML - WARNING - Not enough data to train model for ETH
+2025-03-08 02:57:28,475 - SentimentML - WARNING - Could not load or train model for ETH 1d
+2025-03-08 02:57:28,475 - SentimentML - WARNING - Model files for ETH 3d not found
+2025-03-08 02:57:28,475 - SentimentML - INFO - Training new model for ETH 3d
+2025-03-08 02:57:28,475 - SentimentML - INFO - Training model for ETH with 3-day horizon
+2025-03-08 02:57:28,487 - SentimentML - INFO - Prepared training data for ETH: 0 samples
+2025-03-08 02:57:28,487 - SentimentML - WARNING - Not enough data to train model for ETH
+2025-03-08 02:57:28,487 - SentimentML - WARNING - Could not load or train model for ETH 3d
+2025-03-08 02:57:28,487 - SentimentML - WARNING - Model files for ETH 7d not found
+2025-03-08 02:57:28,487 - SentimentML - INFO - Training new model for ETH 7d
+2025-03-08 02:57:28,487 - SentimentML - INFO - Training model for ETH with 7-day horizon
+2025-03-08 02:57:28,498 - SentimentML - INFO - Prepared training data for ETH: 0 samples
+2025-03-08 02:57:28,498 - SentimentML - WARNING - Not enough data to train model for ETH
+2025-03-08 02:57:28,498 - SentimentML - WARNING - Could not load or train model for ETH 7d
+2025-03-08 02:57:28,498 - SentimentML - WARNING - Model files for ETH 14d not found
+2025-03-08 02:57:28,498 - SentimentML - INFO - Training new model for ETH 14d
+2025-03-08 02:57:28,498 - SentimentML - INFO - Training model for ETH with 14-day horizon
+2025-03-08 02:57:28,509 - SentimentML - INFO - Prepared training data for ETH: 0 samples
+2025-03-08 02:57:28,509 - SentimentML - WARNING - Not enough data to train model for ETH
+2025-03-08 02:57:28,509 - SentimentML - WARNING - Could not load or train model for ETH 14d
+2025-03-08 02:57:28,510 - SentimentML - WARNING - Model files for SOL 1d not found
+2025-03-08 02:57:28,510 - SentimentML - INFO - Training new model for SOL 1d
+2025-03-08 02:57:28,510 - SentimentML - INFO - Training model for SOL with 1-day horizon
+2025-03-08 02:57:28,520 - SentimentML - INFO - Prepared training data for SOL: 0 samples
+2025-03-08 02:57:28,520 - SentimentML - WARNING - Not enough data to train model for SOL
+2025-03-08 02:57:28,521 - SentimentML - WARNING - Could not load or train model for SOL 1d
+2025-03-08 02:57:28,521 - SentimentML - WARNING - Model files for SOL 3d not found
+2025-03-08 02:57:28,521 - SentimentML - INFO - Training new model for SOL 3d
+2025-03-08 02:57:28,521 - SentimentML - INFO - Training model for SOL with 3-day horizon
+2025-03-08 02:57:28,532 - SentimentML - INFO - Prepared training data for SOL: 0 samples
+2025-03-08 02:57:28,532 - SentimentML - WARNING - Not enough data to train model for SOL
+2025-03-08 02:57:28,532 - SentimentML - WARNING - Could not load or train model for SOL 3d
+2025-03-08 02:57:28,532 - SentimentML - WARNING - Model files for SOL 7d not found
+2025-03-08 02:57:28,532 - SentimentML - INFO - Training new model for SOL 7d
+2025-03-08 02:57:28,532 - SentimentML - INFO - Training model for SOL with 7-day horizon
+2025-03-08 02:57:28,542 - SentimentML - INFO - Prepared training data for SOL: 0 samples
+2025-03-08 02:57:28,543 - SentimentML - WARNING - Not enough data to train model for SOL
+2025-03-08 02:57:28,543 - SentimentML - WARNING - Could not load or train model for SOL 7d
+2025-03-08 02:57:28,543 - SentimentML - WARNING - Model files for SOL 14d not found
+2025-03-08 02:57:28,543 - SentimentML - INFO - Training new model for SOL 14d
+2025-03-08 02:57:28,543 - SentimentML - INFO - Training model for SOL with 14-day horizon
+2025-03-08 02:57:28,553 - SentimentML - INFO - Prepared training data for SOL: 0 samples
+2025-03-08 02:57:28,554 - SentimentML - WARNING - Not enough data to train model for SOL
+2025-03-08 02:57:28,554 - SentimentML - WARNING - Could not load or train model for SOL 14d

@@ -1,0 +1,10 @@
+{
+    "run_in_background": true,
+    "enable_youtube_tracker": true,
+    "enable_twitter_collector": false,
+    "enable_sentiment_ml": true,
+    "enable_alert_system": true,
+    "enable_paper_trader": true,
+    "enable_dashboard": true,
+    "enable_performance_tracker": true
+  }

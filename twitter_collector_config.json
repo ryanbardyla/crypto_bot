@@ -1,0 +1,25 @@
+{
+    "search_terms": [
+      "Bitcoin price",
+      "BTC analysis",
+      "Ethereum price",
+      "ETH analysis",
+      "Solana price",
+      "SOL analysis",
+      "crypto market"
+    ],
+    "crypto_symbols": ["BTC", "ETH", "SOL", "DOGE"],
+    "accounts_to_follow": [
+      "cz_binance",
+      "SBF_FTX",
+      "VitalikButerin",
+      "elonmusk",
+      "PeterLBrandt",
+      "CryptoCapo_",
+      "MMCrypto",
+      "aantonop"
+    ],
+    "check_interval_minutes": 30,
+    "max_tweets_per_search": 100,
+    "db_path": "sqlite:///sentiment_database.db"
+}

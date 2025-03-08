@@ -1,0 +1,16 @@
+{
+  "vader_sentiment": {
+    "neg": 0.135,
+    "neu": 0.753,
+    "pos": 0.111,
+    "compound": -0.9852
+  },
+  "bullish_keywords": 1,
+  "bearish_keywords": 4,
+  "keyword_sentiment": -6.0,
+  "combined_score": -7.926,
+  "source": "youtube-6-PHAJrEbls",
+  "text_length": 7170,
+  "timestamp": "2025-03-07 18:02:18",
+  "video_id": "6-PHAJrEbls"
+}

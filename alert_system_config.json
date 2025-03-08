@@ -1,0 +1,15 @@
+
+{
+    "discord_webhook_url": "https://discord.com/api/webhooks/1340815824725868646/iAhNLuuSWL3aUvnSeJtNWohCjGFkd87vae2m4eikkcVnXbF2SFN0yjvKz0cgEMCkZzFj",
+    "sentiment_shift_threshold": 2.0,
+    "extreme_sentiment_threshold": 5.0,
+    "price_divergence_threshold": 3.0,
+    "check_interval_minutes": 60,
+    "lookback_hours": 24,
+    "min_alert_interval_hours": 6,
+    "enable_sentiment_shift": true,
+    "enable_extreme_sentiment": true,
+    "enable_price_divergence": true,
+    "symbols": ["BTC", "ETH", "SOL"],
+    "db_path": "sqlite:///sentiment_database.db"
+  }

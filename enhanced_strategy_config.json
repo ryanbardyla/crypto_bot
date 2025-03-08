@@ -1,0 +1,18 @@
+
+{
+    "channel_weights": {
+      "UCqK_GSMbpiV8spgD3ZGloSw": 2.0,    
+      "UC-f4b-Z-sURs9vOcs_ykd8g": 1.8,     
+      "UCByrKqz72bVunGgpBJe-ltg": 1.7,     
+      "UCiL7A_15FgzRTJNrQdZPqEA": 0.6      
+    },
+    "default_weight": 1.0,
+    "volatility_threshold": 2.5,
+    "trend_threshold": 1.5,
+    "bullish_threshold": 3.0,
+    "bearish_threshold": -3.0,
+    "position_size_range": [0.5, 1.0],
+    "stop_loss_range": [2.0, 5.0],
+    "take_profit_range": [5.0, 15.0],
+    "db_path": "sqlite:///sentiment_database.db"
+  }

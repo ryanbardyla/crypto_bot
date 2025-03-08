@@ -1,0 +1,41 @@
+[
+  {
+    "type": "BUY",
+    "symbol": "BTC",
+    "timestamp": "2025-03-07 16:17:10",
+    "price": 86339,
+    "quantity": 0.0011582251358018972,
+    "value": 100.0,
+    "balance_after": 0.0
+  },
+  {
+    "type": "BUY",
+    "symbol": "SOL",
+    "timestamp": "2025-03-07 16:17:10",
+    "price": 141.76,
+    "quantity": 0.0,
+    "value": 0.0,
+    "balance_after": 0.0
+  },
+  {
+    "type": "BUY",
+    "symbol": "DOGE",
+    "timestamp": "2025-03-07 16:17:11",
+    "price": 0.201395,
+    "quantity": 0.0,
+    "value": 0.0,
+    "balance_after": 0.0
+  },
+  {
+    "type": "SELL",
+    "symbol": "DOGE",
+    "timestamp": "2025-03-07 17:04:45",
+    "price": 0.19948,
+    "quantity": 0.0,
+    "value": 0.0,
+    "profit_loss": 0.0,
+    "profit_loss_pct": -0.950867697807789,
+    "balance_after": 0.0,
+    "reason": "Bearish Signal"
+  }
+]

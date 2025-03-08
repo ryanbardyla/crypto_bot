@@ -1,0 +1,12 @@
+{
+    "performance_log_file": "paper_trading/performance_log.json",
+    "trade_log_file": "paper_trading/trade_history.json",
+    "report_interval_days": 7,
+    "benchmark_symbol": "BTC",
+    "calculate_sharpe": true,
+    "calculate_sortino": true,
+    "calculate_drawdown": true,
+    "calculate_win_rate": true,
+    "output_dir": "performance_reports",
+    "generate_charts": true
+  }

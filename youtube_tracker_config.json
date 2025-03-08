@@ -1,0 +1,17 @@
+{
+    "channel_ids": [
+      "UCqK_GSMbpiV8spgD3ZGloSw",  
+      "UC-f4b-Z-sURs9vOcs_ykd8g",   
+      "UCByrKqz72bVunGgpBJe-ltg",   
+      "UCiL7A_15FgzRTJNrQdZPqEA"    
+    ],
+    "channel_names": {
+      "UCqK_GSMbpiV8spgD3ZGloSw": "Coin Bureau",
+      "UC-f4b-Z-sURs9vOcs_ykd8g": "Technical Roundup",
+      "UCByrKqz72bVunGgpBJe-ltg": "Benjamin Cowen",
+      "UCiL7A_15FgzRTJNrQdZPqEA": "Bitboy Crypto"
+    },
+    "check_interval_hours": 6,
+    "video_age_limit_days": 7,
+    "db_path": "sqlite:///sentiment_database.db"
+  }

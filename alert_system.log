@@ -1,0 +1,26 @@
+2025-03-08 02:53:47,693 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-08 02:53:47,700 - AlertSystem - INFO - Database connection established
+2025-03-08 02:53:47,700 - AlertSystem - INFO - Alert state loaded
+2025-03-08 02:53:47,700 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-08 02:53:47,700 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-08 02:53:47,702 - AlertSystem - ERROR - Error retrieving recent sentiment: dictionary update sequence element #0 has length 19; 2 is required
+2025-03-08 02:53:47,710 - AlertSystem - INFO - Alert state saved
+2025-03-08 02:53:47,710 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
+2025-03-08 02:54:49,956 - AlertSystem - INFO - Alert system stopped by user
+2025-03-08 02:57:27,727 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-08 02:57:27,736 - AlertSystem - INFO - Database connection established
+2025-03-08 02:57:27,736 - AlertSystem - INFO - Alert state loaded
+2025-03-08 02:57:27,736 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-08 02:57:27,736 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-08 02:57:27,738 - AlertSystem - ERROR - Error retrieving recent sentiment: dictionary update sequence element #0 has length 19; 2 is required
+2025-03-08 02:57:27,751 - AlertSystem - INFO - Alert state saved
+2025-03-08 02:57:27,752 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
+2025-03-08 03:16:22,655 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-08 03:16:22,662 - AlertSystem - INFO - Database connection established
+2025-03-08 03:16:22,662 - AlertSystem - INFO - Alert state loaded
+2025-03-08 03:16:22,662 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-08 03:16:22,662 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-08 03:16:22,663 - AlertSystem - ERROR - Error retrieving recent sentiment: dictionary update sequence element #0 has length 19; 2 is required
+2025-03-08 03:16:22,672 - AlertSystem - INFO - Alert state saved
+2025-03-08 03:16:22,672 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
+2025-03-08 03:16:28,869 - AlertSystem - INFO - Alert system stopped by user

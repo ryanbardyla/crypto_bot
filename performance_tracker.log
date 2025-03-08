@@ -1,0 +1,6 @@
+2025-03-08 02:57:28,065 - PerformanceTracker - INFO - Configuration loaded successfully
+2025-03-08 02:57:28,065 - PerformanceTracker - INFO - Loaded 49 performance records
+2025-03-08 02:57:28,065 - PerformanceTracker - INFO - Loaded 4 trade records
+2025-03-08 02:57:28,069 - PerformanceTracker - INFO - Starting scheduled reporting with 7 day interval
+2025-03-08 02:57:28,078 - PerformanceTracker - ERROR - Error calculating metrics: nan
+2025-03-08 02:57:28,078 - PerformanceTracker - WARNING - Could not calculate performance metrics

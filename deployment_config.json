@@ -1,0 +1,17 @@
+{
+    "environment": "development",
+    "deploy_mode": "docker",
+    "docker_image": "crypto-sentiment-bot",
+    "docker_tag": "latest",
+    "cloud_provider": "aws",
+    "aws_region": "us-east-1",
+    "aws_instance_type": "t2.medium",
+    "deploy_youtube_tracker": true,
+    "deploy_twitter_collector": true,
+    "deploy_sentiment_ml": true,
+    "deploy_alert_system": true,
+    "deploy_paper_trader": true,
+    "deploy_dashboard": true,
+    "enable_monitoring": true,
+    "alert_email": "rbardyla@gmail.com"
+  }

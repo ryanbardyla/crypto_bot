@@ -1,0 +1,10 @@
+{
+  "risk_level": "low",
+  "symbols": ["BTC", "ETH", "SOL", "DOGE"],
+  "update_interval_minutes": 5,
+  "max_positions": 3,
+  "use_testnet": true,
+  "position_size_pct": 0.95,
+  "stop_loss_pct": 5.0,
+  "take_profit_pct": 10.0
+}
