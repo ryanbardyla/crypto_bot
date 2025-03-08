@@ -1,0 +1,29 @@
+{
+  "generated_at": "2025-03-07 08:45:27",
+  "symbols_analyzed": [
+    "BTC",
+    "ETH",
+    "SOL",
+    "DOGE"
+  ],
+  "price_data": {
+    "BTC": 90016.0,
+    "ETH": 2214.04,
+    "SOL": 145.69,
+    "DOGE": 0.206499
+  },
+  "signals": {
+    "BTC": [
+      "NEUTRAL: No clear signals detected"
+    ],
+    "ETH": [
+      "NEUTRAL: No clear signals detected"
+    ],
+    "SOL": [
+      "NEUTRAL: No clear signals detected"
+    ],
+    "DOGE": [
+      "NEUTRAL: No clear signals detected"
+    ]
+  }
+}
