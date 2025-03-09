@@ -1,3 +1,4 @@
+# Add these imports to simple_backtester.py
 import os
 import gc
 import json
@@ -7,26 +8,30 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor
+import multiprocessing as mp
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor, as_completed
+from tqdm import tqdm  # For progress bars
 
 # Import the necessary classes
 from multi_api_price_fetcher import CryptoPriceFetcher
 from crypto_analyzer import CryptoAnalyzer
 
-class SimpleBacktester:
-    def __init__(self, initial_capital=10000, chunk_size=1000, memory_threshold=80):
+class ParallelBacktester:
+    def __init__(self, initial_capital=10000, chunk_size=1000, memory_threshold=80, max_workers=None):
         self.initial_capital = initial_capital
-        self.balance = initial_capital
-        self.position = 0
-        self.trades = []
-        self.performance = []
-        self.metrics = {}
-        self.price_fetcher = CryptoPriceFetcher()
-        self.analyzer = CryptoAnalyzer(self.price_fetcher)
         self.chunk_size = chunk_size
         self.memory_threshold = memory_threshold
+        self.max_workers = max_workers or max(1, mp.cpu_count() - 1)  # Default to CPU count - 1
+        self.price_fetcher = CryptoPriceFetcher()
+        self.analyzer = CryptoAnalyzer(self.price_fetcher)
         self.data_dir = "data"
+        self.results_dir = "backtest_results"
+        
+        # Create necessary directories
         os.makedirs(self.data_dir, exist_ok=True)
+        os.makedirs(self.results_dir, exist_ok=True)
+        
+        print(f"Initialized ParallelBacktester with {self.max_workers} workers")
     
     def check_memory_usage(self, critical=False):
         """Monitor memory usage and take action if it exceeds threshold"""
@@ -43,414 +48,333 @@ class SimpleBacktester:
                     raise MemoryError(f"Memory usage too high ({usage_percent:.1f}%). Stopping operation.")
         return usage_percent < self.memory_threshold
     
-    def get_data_iterator(self, symbol, file_path=None):
-        """Generator that yields data in chunks to conserve memory"""
-        if file_path and os.path.exists(file_path):
-            print(f"Loading {symbol} price data from {file_path} in chunks")
-            for chunk in pd.read_csv(file_path, chunksize=self.chunk_size):
-                if 'timestamp' in chunk.columns and isinstance(chunk['timestamp'].iloc[0], str):
-                    chunk['timestamp'] = pd.to_datetime(chunk['timestamp'])
-                yield chunk
-        else:
-            print(f"Loading {symbol} price data from internal history")
-            df = self.analyzer.convert_history_to_dataframe(symbol)
-            if df is None or len(df) < 10:
-                print(f"Warning: Not enough price data for {symbol}. Need at least 10 data points.")
-                return
-            
-            total_rows = len(df)
-            for i in range(0, total_rows, self.chunk_size):
-                end_idx = min(i + self.chunk_size, total_rows)
-                yield df.iloc[i:end_idx].copy()
-                
-                # Check memory after processing each chunk
-                self.check_memory_usage()
-    
-    def load_price_data(self, symbol, file_path=None, memory_efficient=True):
-        """Load price data efficiently based on memory constraints"""
-        if memory_efficient:
-            return self.get_data_iterator(symbol, file_path)
-        else:
+    def get_all_symbols(self):
+        """Get all available symbols for backtesting"""
+        symbols = []
+        
+        # Check price_history.json
+        if os.path.exists("price_history.json"):
             try:
-                print(f"Loading {symbol} price data from {file_path}")
-                df = pd.read_csv(file_path)
-                if 'timestamp' in df.columns and isinstance(df['timestamp'].iloc[0], str):
-                    df['timestamp'] = pd.to_datetime(df['timestamp'])
-                return df
+                with open("price_history.json", "r") as f:
+                    price_history = json.load(f)
+                    symbols.extend(list(price_history.keys()))
             except Exception as e:
-                print(f"Error loading price data: {e}")
-                return self.analyzer.convert_history_to_dataframe(symbol)
+                print(f"Error loading price_history.json: {e}")
+        
+        # Check data directory for CSV files
+        if os.path.exists(self.data_dir):
+            for file in os.listdir(self.data_dir):
+                if file.endswith(".csv"):
+                    # Try to extract symbol from filename patterns like "BTC_historical.csv"
+                    parts = file.split("_")
+                    if len(parts) > 0 and len(parts[0]) <= 5:  # Most crypto symbols are short
+                        symbol = parts[0].upper()
+                        if symbol not in symbols:
+                            symbols.append(symbol)
+        
+        return sorted(list(set(symbols)))  # Remove duplicates and sort
     
-    def simple_strategy(self, df):
-        """Simple moving average crossover strategy"""
-        if len(df) < 20:  # Need at least 20 data points for meaningful strategy
-            print("Not enough data for strategy calculation")
-            return None
-            
-        result = df.copy()
-        result['short_ma'] = result['price'].rolling(window=5).mean()
-        result['long_ma'] = result['price'].rolling(window=15).mean()
-        result['signal'] = 0
-        result['signal_strength'] = 0
+    def backtest_symbol(self, symbol, strategy_func=None, days=None, file_path=None):
+        """Backtest a single symbol with the specified strategy"""
+        print(f"Starting backtest for {symbol}...")
         
-        for i in range(1, len(result)):
-            if pd.notna(result['short_ma'].iloc[i]) and pd.notna(result['long_ma'].iloc[i]):
-                # Crossing above: Buy signal
-                if result['short_ma'].iloc[i] > result['long_ma'].iloc[i] and result['short_ma'].iloc[i-1] <= result['long_ma'].iloc[i-1]:
-                    result.loc[result.index[i], 'signal'] = 1
-                    # Signal strength based on distance between MAs
-                    strength = (result['short_ma'].iloc[i] - result['long_ma'].iloc[i]) / result['price'].iloc[i] * 100
-                    result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, strength / 2))
-                
-                # Crossing below: Sell signal
-                elif result['short_ma'].iloc[i] < result['long_ma'].iloc[i] and result['short_ma'].iloc[i-1] >= result['long_ma'].iloc[i-1]:
-                    result.loc[result.index[i], 'signal'] = -1
-                    # Signal strength based on distance between MAs
-                    strength = (result['long_ma'].iloc[i] - result['short_ma'].iloc[i]) / result['price'].iloc[i] * 100
-                    result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, strength / 2))
+        # Initialize a separate backtester instance for this symbol
+        # This avoids any shared state issues
+        from simple_backtester import SimpleBacktester
+        backtester = SimpleBacktester(
+            initial_capital=self.initial_capital,
+            chunk_size=self.chunk_size,
+            memory_threshold=self.memory_threshold
+        )
         
-        return result
-    
-    def backtest_chunk(self, strategy_df, starting_balance, starting_position, initial=False):
-        """Process a chunk of data for backtesting"""
-        balance = starting_balance
-        position = starting_position
-        local_trades = []
-        local_performance = []
-        max_balance = balance
-        current_drawdown = 0
+        # Determine the file path if not provided
+        if file_path is None:
+            file_path = os.path.join(self.data_dir, f"{symbol}_historical.csv")
+            if not os.path.exists(file_path):
+                file_path = None  # Let backtester use price_history.json
         
-        for i in range(0, len(strategy_df)):
-            price = strategy_df['price'].iloc[i]
-            signal = strategy_df['signal'].iloc[i]
-            signal_strength = strategy_df['signal_strength'].iloc[i]
-            timestamp = strategy_df.index[i] if isinstance(strategy_df.index[i], datetime) else i
-            
-            # Calculate position value
-            position_value = position * price
-            total_value = balance + position_value
-            
-            # Calculate drawdown
-            if total_value > max_balance:
-                max_balance = total_value
-                current_drawdown = 0
-            else:
-                current_drawdown = (max_balance - total_value) / max_balance * 100
-            
-            # Record performance
-            local_performance.append({
-                'timestamp': timestamp,
-                'balance': balance,
-                'position': position,
-                'position_value': position_value,
-                'total_value': total_value,
-                'return_pct': (total_value / self.initial_capital - 1) * 100
-            })
-            
-            # Process signals
-            if signal == 1 and position == 0:  # Buy signal
-                position_size = balance * signal_strength
-                position = position_size / price
-                balance -= position_size
-                
-                local_trades.append({
-                    'type': 'BUY',
-                    'timestamp': timestamp,
-                    'price': price,
-                    'quantity': position,
-                    'value': position_size,
-                    'balance_after': balance
-                })
-                
-            elif signal == -1 and position > 0:  # Sell signal
-                sale_value = position * price
-                profit_loss = sale_value - (position * local_trades[-1]['price'])
-                profit_loss_pct = profit_loss / (position * local_trades[-1]['price']) * 100
-                
-                balance += sale_value
-                
-                local_trades.append({
-                    'type': 'SELL',
-                    'timestamp': timestamp,
-                    'price': price,
-                    'quantity': position,
-                    'value': sale_value,
-                    'profit_loss': profit_loss,
-                    'profit_loss_pct': profit_loss_pct,
-                    'balance_after': balance
-                })
-                
-                position = 0
-            
-            # Update max drawdown in metrics
-            if len(self.metrics) > 0:  # Update max drawdown if metrics exist
-                self.metrics["max_drawdown_pct"] = max(self.metrics.get("max_drawdown_pct", 0), current_drawdown)
-        
-        return balance, position, local_trades, local_performance, max_balance
-    
-    def backtest(self, symbol, strategy_func=None, file_path=None, memory_efficient=True):
-        """Backtest a trading strategy on historical data"""
-        self.balance = self.initial_capital
-        self.position = 0
-        self.trades = []
-        self.performance = []
-        self.metrics = {}
-        
-        if strategy_func is None:
-            strategy_func = self.simple_strategy
-        
-        self.check_memory_usage()
-        
+        # Run the backtest
         try:
-            if memory_efficient:
-                data_iterator = self.load_price_data(symbol, file_path, memory_efficient=True)
-                if data_iterator is None:
-                    print("Cannot run backtest: No price data available")
-                    return None
+            result = backtester.backtest(symbol, strategy_func, file_path)
+            
+            if result:
+                # Save the results
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                result_file = os.path.join(self.results_dir, f"{symbol}_backtest_{timestamp}.json")
+                with open(result_file, "w") as f:
+                    json.dump({
+                        "symbol": symbol,
+                        "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                        "metrics": result,
+                        "trades_count": len(backtester.trades)
+                    }, f, indent=2, default=str)
                 
-                chunks_processed = 0
-                for chunk in data_iterator:
-                    chunks_processed += 1
-                    print(f"Processing chunk {chunks_processed} ({len(chunk)} rows)")
-                    
-                    # Check memory before processing each chunk
-                    self.check_memory_usage(critical=True)
-                    
-                    strategy_df = strategy_func(chunk)
-                    if strategy_df is None or len(strategy_df) == 0:
-                        print("Cannot process chunk: Strategy failed to generate signals")
-                        continue
-                    
-                    # Process chunk
-                    self.balance, self.position, chunk_trades, chunk_performance, max_balance = self.backtest_chunk(
-                        strategy_df, self.balance, self.position, initial=(chunks_processed == 1)
-                    )
-                    
-                    self.trades.extend(chunk_trades)
-                    self.performance.extend(chunk_performance)
-                    
-                    # Force garbage collection after each chunk
-                    del strategy_df, chunk_trades, chunk_performance
-                    gc.collect()
-            else:
-                # Non-chunked processing (legacy mode)
-                df = self.load_price_data(symbol, file_path, memory_efficient=False)
-                strategy_df = strategy_func(df)
-                if strategy_df is None:
-                    print("Cannot run backtest: Strategy failed to generate signals")
-                    return None
+                # Generate chart if requested
+                chart_file = os.path.join(self.results_dir, f"{symbol}_backtest_{timestamp}.png")
+                backtester.plot_performance(symbol, save_to_file=chart_file)
                 
-                self.balance, self.position, self.trades, self.performance, _ = self.backtest_chunk(
-                    strategy_df, self.balance, self.position, initial=True
-                )
-            
-            # Calculate metrics
-            if len(self.trades) == 0:
-                print("No trades executed during backtest")
-                return {"return_pct": 0, "win_rate": 0, "profit_factor": 0}
-            
-            # Calculate performance metrics
-            sell_trades = [t for t in self.trades if t.get("type") == "SELL"]
-            self.metrics["total_trades"] = len(sell_trades)
-            self.metrics["winning_trades"] = sum(1 for t in sell_trades if t.get("profit_loss", 0) > 0)
-            self.metrics["losing_trades"] = sum(1 for t in sell_trades if t.get("profit_loss", 0) <= 0)
-            
-            if self.metrics["total_trades"] > 0:
-                self.metrics["win_rate"] = (self.metrics["winning_trades"] / self.metrics["total_trades"]) * 100
+                return {
+                    "symbol": symbol,
+                    "success": True,
+                    "metrics": result,
+                    "chart_file": chart_file,
+                    "result_file": result_file
+                }
             else:
-                self.metrics["win_rate"] = 0
-            
-            # Calculate return percentage
-            if self.position > 0 and len(self.performance) > 0:
-                final_value = self.performance[-1]["total_value"]
-            else:
-                final_value = self.balance
-                
-            self.metrics["starting_balance"] = self.initial_capital
-            self.metrics["ending_balance"] = final_value
-            self.metrics["return"] = final_value - self.initial_capital
-            self.metrics["return_pct"] = (final_value / self.initial_capital - 1) * 100
-            
-            # Calculate profit factor (sum of profits divided by sum of losses)
-            total_profits = sum(t.get("profit_loss", 0) for t in sell_trades if t.get("profit_loss", 0) > 0)
-            total_losses = abs(sum(t.get("profit_loss", 0) for t in sell_trades if t.get("profit_loss", 0) < 0))
-            self.metrics["profit_factor"] = total_profits / total_losses if total_losses > 0 else float('inf')
-            
-            print(f"\nBacktest completed for {symbol}:")
-            print(f"Initial capital: ${self.initial_capital:.2f}")
-            print(f"Final capital: ${final_value:.2f}")
-            print(f"Return: {self.metrics['return_pct']:.2f}%")
-            print(f"Win Rate: {self.metrics['win_rate']:.2f}%")
-            print(f"Max Drawdown: {self.metrics.get('max_drawdown_pct', 0):.2f}%")
-            
-            return self.metrics
-            
+                return {
+                    "symbol": symbol,
+                    "success": False,
+                    "error": "Backtest returned no results"
+                }
         except Exception as e:
-            print(f"Error during backtest: {e}")
-            return None
-
-       
-    def plot_performance(self, symbol, save_to_file=None):
-        """
-        Plot backtest performance results.
+            print(f"Error backtesting {symbol}: {str(e)}")
+            return {
+                "symbol": symbol,
+                "success": False,
+                "error": str(e)
+            }
+    
+    def backtest_multiple(self, symbols=None, strategy_func=None, days=None, parallel=True):
+        """Backtest multiple symbols in parallel or sequentially"""
+        if symbols is None:
+            symbols = self.get_all_symbols()
+            
+        if not symbols:
+            print("No symbols found for backtesting")
+            return {}
+            
+        print(f"Backtesting {len(symbols)} symbols: {', '.join(symbols)}")
         
-        Args:
-            symbol (str): The cryptocurrency symbol
-            save_to_file (str, optional): Path to save the performance chart
-        """
-        if not self.performance:
-            print("No performance data to plot")
+        results = {}
+        
+        if parallel and len(symbols) > 1:
+            # Use ProcessPoolExecutor for true parallelism
+            with ProcessPoolExecutor(max_workers=self.max_workers) as executor:
+                # Submit all backtest tasks
+                futures = {
+                    executor.submit(self.backtest_symbol, symbol, strategy_func, days): symbol 
+                    for symbol in symbols
+                }
+                
+                # Process results as they complete
+                for future in tqdm(as_completed(futures), total=len(futures), desc="Backtesting Progress"):
+                    symbol = futures[future]
+                    try:
+                        result = future.result()
+                        results[symbol] = result
+                        
+                        if result["success"]:
+                            metrics = result["metrics"]
+                            print(f"\n{symbol} Backtest Results:")
+                            print(f"Return: {metrics['return_pct']:.2f}%")
+                            print(f"Win Rate: {metrics.get('win_rate', 0):.2f}%")
+                            print(f"Max Drawdown: {metrics.get('max_drawdown_pct', 0):.2f}%")
+                            print(f"Chart saved to: {result['chart_file']}")
+                        else:
+                            print(f"\n{symbol} Backtest Failed: {result.get('error', 'Unknown error')}")
+                    except Exception as e:
+                        print(f"Error processing results for {symbol}: {e}")
+                        results[symbol] = {
+                            "symbol": symbol,
+                            "success": False,
+                            "error": str(e)
+                        }
+        else:
+            # Sequential processing
+            for symbol in symbols:
+                results[symbol] = self.backtest_symbol(symbol, strategy_func, days)
+                
+                if results[symbol]["success"]:
+                    metrics = results[symbol]["metrics"]
+                    print(f"\n{symbol} Backtest Results:")
+                    print(f"Return: {metrics['return_pct']:.2f}%")
+                    print(f"Win Rate: {metrics.get('win_rate', 0):.2f}%")
+                    print(f"Max Drawdown: {metrics.get('max_drawdown_pct', 0):.2f}%")
+                    print(f"Chart saved to: {results[symbol]['chart_file']}")
+                else:
+                    print(f"\n{symbol} Backtest Failed: {results[symbol].get('error', 'Unknown error')}")
+        
+        # Create a summary report
+        self.generate_summary_report(results)
+        
+        return results
+    
+    def generate_summary_report(self, results):
+        """Generate a summary report of all backtest results"""
+        successful_results = {s: r for s, r in results.items() if r["success"]}
+        
+        if not successful_results:
+            print("No successful backtest results to summarize")
             return
         
-        # Check memory before plotting
-        self.check_memory_usage()
+        # Prepare summary data
+        summary_data = []
+        for symbol, result in successful_results.items():
+            metrics = result["metrics"]
+            summary_data.append({
+                "symbol": symbol,
+                "return_pct": metrics.get("return_pct", 0),
+                "win_rate": metrics.get("win_rate", 0),
+                "profit_factor": metrics.get("profit_factor", 0),
+                "max_drawdown_pct": metrics.get("max_drawdown_pct", 0),
+                "trades": metrics.get("total_trades", 0)
+            })
         
-        # Convert to DataFrame for plotting
-        df = pd.DataFrame(self.performance)
+        # Convert to DataFrame for easier sorting and display
+        df = pd.DataFrame(summary_data)
         
-        if 'timestamp' in df.columns:
-            df['timestamp'] = pd.to_datetime(df['timestamp'])
-            df.set_index('timestamp', inplace=True)
+        # Sort by return percentage (descending)
+        df = df.sort_values("return_pct", ascending=False)
         
-        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+        # Save to CSV
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        csv_file = os.path.join(self.results_dir, f"backtest_summary_{timestamp}.csv")
+        df.to_csv(csv_file, index=False)
         
-        # Plot equity curve
-        df['total_value'].plot(ax=ax1, label='Total Value')
-        df['balance'].plot(ax=ax1, label='Cash Balance')
-        ax1.set_title('Paper Trading Account Performance')
-        ax1.set_ylabel('Value ($)')
-        ax1.legend()
-        ax1.grid(True, alpha=0.3)
+        # Display summary
+        print("\n=== Backtest Summary ===")
+        print(f"Total symbols tested: {len(results)}")
+        print(f"Successful backtests: {len(successful_results)}")
+        print(f"Failed backtests: {len(results) - len(successful_results)}")
         
-        # Plot return percentage
-        if 'return_pct' in df.columns:
-            df['return_pct'].plot(ax=ax2, color='green')
-            ax2.set_ylabel('Return (%)')
-            ax2.grid(True, alpha=0.3)
-            ax2.axhline(y=0, color='r', linestyle='-', alpha=0.3)
+        print("\nTop Performing Symbols:")
+        for i, row in df.head(5).iterrows():
+            print(f"{row['symbol']}: {row['return_pct']:.2f}% return, {row['win_rate']:.2f}% win rate")
         
-        # Add trade markers if available
-        buy_trades = [t for t in self.trades if t.get('type') == 'BUY']
-        sell_trades = [t for t in self.trades if t.get('type') == 'SELL']
+        print(f"\nSummary saved to: {csv_file}")
         
-        try:
-            if buy_trades and 'timestamp' in buy_trades[0]:
-                buy_times = pd.to_datetime([trade['timestamp'] for trade in buy_trades])
-                buy_values = [trade.get('value', 0) for trade in buy_trades]
-                ax1.scatter(buy_times, buy_values, marker='^', color='green', s=100, label='Buy')
-                
-            if sell_trades and 'timestamp' in sell_trades[0]:
-                sell_times = pd.to_datetime([trade['timestamp'] for trade in sell_trades])
-                sell_values = [trade.get('value', 0) for trade in sell_trades]
-                ax1.scatter(sell_times, sell_values, marker='v', color='red', s=100, label='Sell')
-                
-                # Add profit/loss annotations
-                for trade in sell_trades:
-                    if 'profit_loss' in trade and 'timestamp' in trade:
-                        time = pd.to_datetime(trade['timestamp'])
-                        price = trade.get('value', 0)
-                        pnl = trade.get('profit_loss', 0)
-                        pnl_pct = (pnl / price * 100) if price else 0
-                        
-                        ax1.annotate(f"${pnl:.0f}\n({pnl_pct:.1f}%)", 
-                                    xy=(time, price),
-                                    xytext=(10, 20),
-                                    textcoords='offset points',
-                                    arrowprops=dict(arrowstyle='->', color='black'),
-                                    color='green' if pnl > 0 else 'red')
-                        
-        except Exception as e:
-            print(f"Error adding trade markers: {e}")
+        # Generate comparison chart
+        self.plot_performance_comparison(df)
+    
+    def plot_performance_comparison(self, summary_df):
+        """Create a comparative performance chart for all symbols"""
+        if len(summary_df) <= 1:
+            return  # Need at least 2 symbols to compare
             
+        plt.figure(figsize=(12, 8))
+        
+        # Plot returns
+        ax1 = plt.subplot(2, 1, 1)
+        summary_df.plot(x='symbol', y='return_pct', kind='bar', color='green', ax=ax1)
+        ax1.set_title('Return Percentage by Symbol')
+        ax1.set_ylabel('Return %')
+        ax1.grid(axis='y', alpha=0.3)
+        
+        # Plot win rate and drawdown
+        ax2 = plt.subplot(2, 1, 2)
+        summary_df.plot(x='symbol', y='win_rate', kind='bar', color='blue', ax=ax2, position=1, width=0.3)
+        summary_df.plot(x='symbol', y='max_drawdown_pct', kind='bar', color='red', ax=ax2, position=0, width=0.3)
+        ax2.set_title('Win Rate and Max Drawdown by Symbol')
+        ax2.set_ylabel('Percentage')
+        ax2.grid(axis='y', alpha=0.3)
+        ax2.legend(['Win Rate', 'Max Drawdown'])
+        
         plt.tight_layout()
         
-        if save_to_file:
-            plt.savefig(save_to_file)
-            print(f"Performance chart saved to {save_to_file}")
-        else:
-            plt.show()
+        # Save chart
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        chart_file = os.path.join(self.results_dir, f"performance_comparison_{timestamp}.png")
+        plt.savefig(chart_file)
+        plt.close()
         
-        # Clean up to free memory
-        plt.close(fig)
-        gc.collect()
-        
-    def save_backtest_results(self, symbol, filename=None):
-        """
-        Save backtest results to a JSON file.
-        
-        Args:
-            symbol (str): The cryptocurrency symbol
-            filename (str, optional): Custom filename for results
-            
-        Returns:
-            str: Path to the saved file
-        """
-        if not filename:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"backtest_{symbol}_{timestamp}.json"
-        
-        results = {
-            "symbol": symbol,
-            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "initial_capital": self.initial_capital,
-            "final_balance": self.balance,
-            "position": self.position,
-            "trades": self.trades,
-            "performance_summary": {
-                "total_trades": self.metrics["total_trades"],
-                "winning_trades": self.metrics["winning_trades"],
-                "losing_trades": self.metrics["losing_trades"],
-                "win_rate": (self.metrics["winning_trades"] / self.metrics["total_trades"] * 100) if self.metrics["total_trades"] > 0 else 0,
-                "profit_factor": self.metrics.get("profit_factor", 0),
-                "max_drawdown_pct": self.metrics["max_drawdown_pct"]
-            }
-        }
-        
-        with open(filename, 'w') as f:
-            json.dump(results, f, indent=2, default=str)
-        
-        print(f"Backtest results saved to {filename}")
-        return filename
+        print(f"Performance comparison chart saved to: {chart_file}")
 
-# Example usage
+def find_best_opportunities(initial_capital=10000, strategy_func=None, lookback_days=180):
+    """Find the most profitable tokens based on backtest results"""
+    # Initialize the parallel backtester
+    backtester = ParallelBacktester(initial_capital=initial_capital)
+    
+    # Get all available symbols
+    symbols = backtester.get_all_symbols()
+    print(f"Found {len(symbols)} symbols for opportunity analysis")
+    
+    # Run backtests in parallel
+    results = backtester.backtest_multiple(symbols, strategy_func=strategy_func, days=lookback_days)
+    
+    # Filter successful results and rank by performance
+    successful = {s: r for s, r in results.items() if r["success"]}
+    
+    if not successful:
+        print("No successful backtests to analyze")
+        return []
+    
+    # Create a DataFrame with metrics for comparison
+    metrics_data = []
+    for symbol, result in successful.items():
+        metrics = result["metrics"]
+        
+        # Calculate a combined score based on multiple factors
+        # 60% weight on returns, 20% on win rate, 20% on inverse of max drawdown
+        return_pct = metrics.get("return_pct", 0)
+        win_rate = metrics.get("win_rate", 0)
+        max_drawdown = metrics.get("max_drawdown_pct", 100) if metrics.get("max_drawdown_pct") else 100
+        drawdown_factor = 100 / max(1, max_drawdown)  # Inverse of drawdown (higher is better)
+        
+        combined_score = (0.6 * return_pct) + (0.2 * win_rate) + (0.2 * drawdown_factor * 10)
+        
+        metrics_data.append({
+            "symbol": symbol,
+            "return_pct": return_pct,
+            "win_rate": win_rate,
+            "max_drawdown_pct": max_drawdown,
+            "profit_factor": metrics.get("profit_factor", 0),
+            "total_trades": metrics.get("total_trades", 0),
+            "combined_score": combined_score
+        })
+    
+    # Create DataFrame and sort by combined score
+    df = pd.DataFrame(metrics_data)
+    df = df.sort_values("combined_score", ascending=False)
+    
+    # Save the opportunity analysis
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    csv_file = f"opportunity_analysis_{timestamp}.csv"
+    df.to_csv(csv_file, index=False)
+    
+    # Display top opportunities
+    print("\n=== Top Trading Opportunities ===")
+    for i, row in df.head(10).iterrows():
+        print(f"{i+1}. {row['symbol']}: Score {row['combined_score']:.2f}, Return {row['return_pct']:.2f}%, " +
+              f"Win Rate {row['win_rate']:.2f}%, Max DD {row['max_drawdown_pct']:.2f}%")
+    
+    print(f"\nComplete analysis saved to: {csv_file}")
+    
+    # Return the top opportunities
+    return df.head(10).to_dict('records')
+
+
+# Demo usage
 if __name__ == "__main__":
-    print("Simple Cryptocurrency Backtester with Memory Management")
-    print("------------------------------------------------------")
+    print("Multi-Token Parallel Backtester")
+    print("------------------------------")
     
-    capital = float(input("Enter starting capital (default: $10000): ") or 10000)
-    chunk_size = int(input("Enter processing chunk size (default: 1000): ") or 1000)
-    memory_threshold = int(input("Enter memory usage threshold % (default: 80): ") or 80)
+    # Get user input for configuration
+    capital = float(input("Enter initial capital (default: $10000): ") or 10000)
+    chunk_size = int(input("Enter chunk size (default: 1000): ") or 1000)
+    max_workers = int(input("Enter max parallel workers (default: auto): ") or 0)
     
-    backtester = SimpleBacktester(initial_capital=capital, chunk_size=chunk_size, memory_threshold=memory_threshold)
+    # Create backtester
+    backtester = ParallelBacktester(
+        initial_capital=capital,
+        chunk_size=chunk_size,
+        max_workers=max_workers if max_workers > 0 else None
+    )
     
-    symbol = input("Enter cryptocurrency symbol to backtest (default: BTC): ").upper() or "BTC"
-    memory_efficient = input("Use memory-efficient mode? (y/n, default: y): ").lower() != 'n'
+    # Get all available symbols
+    all_symbols = backtester.get_all_symbols()
+    print(f"Found {len(all_symbols)} symbols for backtesting: {', '.join(all_symbols)}")
     
-    print(f"\nRunning backtest for {symbol} in {'memory-efficient' if memory_efficient else 'standard'} mode...")
-    results = backtester.backtest(symbol, memory_efficient=memory_efficient)
-    
-    if results:
-        print("\nBacktest Results Summary:")
-        print(f"Starting Balance: ${results['starting_balance']:.2f}")
-        print(f"Ending Balance: ${results['ending_balance']:.2f}")
-        print(f"Return: {results['return_pct']:.2f}%")
-        print(f"Total Trades: {results['total_trades']}")
-        
-        if results['total_trades'] > 0:
-            print(f"Win Rate: {results['win_rate']:.2f}% ({results['winning_trades']}/{results['total_trades']})")
-            print(f"Profit Factor: {results['profit_factor']:.2f}")
-            
-        print(f"Max Drawdown: {results['max_drawdown_pct']:.2f}%")
-        
-        generate_chart = input("\nGenerate performance chart? (y/n): ").lower() == 'y'
-        if generate_chart:
-            os.makedirs("charts", exist_ok=True)
-            chart_path = f"charts/backtest_{symbol}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-            print("\nGenerating backtest chart...")
-            backtester.plot_performance(symbol, save_to_file=chart_path)
-        
-        save_results = input("\nDo you want to save detailed backtest results? (y/n): ").lower() == 'y'
-        if save_results:
-            backtester.save_backtest_results(symbol)
+    # Ask which symbols to test
+    symbols_input = input("Enter symbols to test (comma-separated, or 'all' for all symbols): ")
+    if symbols_input.lower() == 'all':
+        symbols = all_symbols
     else:
-        print("\nBacktest failed. Please check error messages above.")
+        symbols = [s.strip().upper() for s in symbols_input.split(',')]
+    
+    # Ask about parallel processing
+    parallel = input("Use parallel processing? (y/n, default: y): ").lower() != 'n'
+    
+    # Run backtests
+    results = backtester.backtest_multiple(symbols, parallel=parallel)
+    
+    print("\nBacktesting complete!")

@@ -17,6 +17,277 @@ logger = get_module_logger("PaperTrader")
 from multi_api_price_fetcher import CryptoPriceFetcher
 from crypto_analyzer import CryptoAnalyzer
 
+class StrategyManager:
+    """Manages and loads trading strategies dynamically"""
+    
+    def __init__(self):
+        self.available_strategies = {}
+        self.active_strategy = None
+        self.strategy_params = {}
+        
+        # Register built-in strategies
+        self.register_built_in_strategies()
+    
+    def register_built_in_strategies(self):
+        """Register the built-in strategies"""
+        # Simple moving average crossover strategy
+        self.register_strategy(
+            "ma_crossover", 
+            self.ma_crossover_strategy,
+            {"short_period": 5, "long_period": 20}
+        )
+        
+        # RSI strategy
+        self.register_strategy(
+            "rsi", 
+            self.rsi_strategy,
+            {"period": 14, "oversold": 30, "overbought": 70}
+        )
+        
+        # Sentiment-based strategy
+        self.register_strategy(
+            "sentiment", 
+            self.sentiment_strategy,
+            {"sentiment_threshold": 3.0, "lookback_days": 3}
+        )
+        
+        # Enhanced hybrid strategy
+        self.register_strategy(
+            "enhanced_hybrid", 
+            self.enhanced_hybrid_strategy,
+            {"sentiment_weight": 0.6, "technical_weight": 0.4}
+        )
+    
+    def register_strategy(self, name, strategy_func, default_params=None):
+        """Register a new strategy"""
+        self.available_strategies[name] = {
+            "function": strategy_func,
+            "default_params": default_params or {}
+        }
+        print(f"Registered strategy: {name}")
+    
+    def load_external_strategy(self, module_name, strategy_name=None):
+        """Dynamically load a strategy from an external Python module"""
+        try:
+            import importlib
+            module = importlib.import_module(module_name)
+            
+            if strategy_name is None:
+                # If no specific strategy name is provided, look for a 'get_strategy' function
+                if hasattr(module, 'get_strategy'):
+                    strategy_func = module.get_strategy()
+                    name = module_name.split('.')[-1]
+                    params = getattr(module, 'default_params', {})
+                    self.register_strategy(name, strategy_func, params)
+                    return name
+                else:
+                    raise ValueError(f"Module {module_name} does not contain a get_strategy function")
+            else:
+                # Load a specific strategy from the module
+                if hasattr(module, strategy_name):
+                    strategy_func = getattr(module, strategy_name)
+                    params = getattr(module, 'default_params', {})
+                    self.register_strategy(strategy_name, strategy_func, params)
+                    return strategy_name
+                else:
+                    raise ValueError(f"Module {module_name} does not contain strategy {strategy_name}")
+        except Exception as e:
+            print(f"Error loading external strategy: {e}")
+            return None
+    
+    def get_available_strategies(self):
+        """Get list of available strategies"""
+        return list(self.available_strategies.keys())
+    
+    def set_active_strategy(self, strategy_name, custom_params=None):
+        """Set the active strategy with optional custom parameters"""
+        if strategy_name not in self.available_strategies:
+            print(f"Strategy '{strategy_name}' not found")
+            return False
+        
+        self.active_strategy = strategy_name
+        
+        # Start with default parameters
+        self.strategy_params = self.available_strategies[strategy_name]["default_params"].copy()
+        
+        # Update with custom parameters if provided
+        if custom_params:
+            self.strategy_params.update(custom_params)
+            
+        print(f"Activated strategy: {strategy_name} with parameters: {self.strategy_params}")
+        return True
+    
+    def generate_signals(self, df):
+        """Generate trading signals using the active strategy"""
+        if not self.active_strategy:
+            print("No active strategy selected")
+            return None
+        
+        strategy_func = self.available_strategies[self.active_strategy]["function"]
+        return strategy_func(df, self.strategy_params)
+    
+    # Built-in strategy implementations
+    def ma_crossover_strategy(self, df, params):
+        """Moving average crossover strategy"""
+        if len(df) < params["long_period"]:
+            return None
+            
+        result = df.copy()
+        result['short_ma'] = result['price'].rolling(window=params["short_period"]).mean()
+        result['long_ma'] = result['price'].rolling(window=params["long_period"]).mean()
+        result['signal'] = 0
+        result['signal_strength'] = 0
+        
+        for i in range(1, len(result)):
+            if pd.notna(result['short_ma'].iloc[i]) and pd.notna(result['long_ma'].iloc[i]):
+                # Crossing above: Buy signal
+                if result['short_ma'].iloc[i] > result['long_ma'].iloc[i] and result['short_ma'].iloc[i-1] <= result['long_ma'].iloc[i-1]:
+                    result.loc[result.index[i], 'signal'] = 1
+                    # Signal strength based on distance between MAs
+                    strength = (result['short_ma'].iloc[i] - result['long_ma'].iloc[i]) / result['price'].iloc[i] * 100
+                    result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, strength / 2))
+                
+                # Crossing below: Sell signal
+                elif result['short_ma'].iloc[i] < result['long_ma'].iloc[i] and result['short_ma'].iloc[i-1] >= result['long_ma'].iloc[i-1]:
+                    result.loc[result.index[i], 'signal'] = -1
+                    # Signal strength based on distance between MAs
+                    strength = (result['long_ma'].iloc[i] - result['short_ma'].iloc[i]) / result['price'].iloc[i] * 100
+                    result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, strength / 2))
+        
+        return result
+    
+    def rsi_strategy(self, df, params):
+        """RSI-based strategy"""
+        if len(df) < params["period"]:
+            return None
+            
+        result = df.copy()
+        
+        # Calculate RSI
+        delta = result['price'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=params["period"]).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=params["period"]).mean()
+        
+        rs = gain / loss.replace(0, 1e-10)  # Avoid division by zero
+        result['rsi'] = 100 - (100 / (1 + rs))
+        
+        result['signal'] = 0
+        result['signal_strength'] = 0
+        
+        for i in range(1, len(result)):
+            if pd.isna(result['rsi'].iloc[i]):
+                continue
+                
+            # Buy signal: RSI crosses above oversold level
+            if result['rsi'].iloc[i] > params["oversold"] and result['rsi'].iloc[i-1] <= params["oversold"]:
+                result.loc[result.index[i], 'signal'] = 1
+                # Signal strength increases as RSI gets more oversold
+                strength = (params["oversold"] - min(result['rsi'].iloc[i-1], params["oversold"])) / params["oversold"]
+                result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, 0.5 + strength))
+                
+            # Sell signal: RSI crosses below overbought level
+            elif result['rsi'].iloc[i] < params["overbought"] and result['rsi'].iloc[i-1] >= params["overbought"]:
+                result.loc[result.index[i], 'signal'] = -1
+                # Signal strength increases as RSI gets more overbought
+                strength = (min(result['rsi'].iloc[i-1], 100) - params["overbought"]) / (100 - params["overbought"])
+                result.loc[result.index[i], 'signal_strength'] = min(1.0, max(0.1, 0.5 + strength))
+        
+        return result
+    
+    def sentiment_strategy(self, df, params):
+        """Pure sentiment-based strategy"""
+        from database_manager import DatabaseManager
+        
+        result = df.copy()
+        result['signal'] = 0
+        result['signal_strength'] = 0
+        
+        try:
+            # Get recent sentiment data
+            db = DatabaseManager()
+            sentiment_data = db.get_aggregated_sentiment(days=params["lookback_days"])
+            
+            if not sentiment_data:
+                print("No sentiment data available")
+                return result
+            
+            # Calculate average sentiment score
+            total_score = sum(record.get('avg_sentiment', 0) for record in sentiment_data)
+            avg_sentiment = total_score / len(sentiment_data)
+            
+            # Apply signals based on sentiment threshold
+            if avg_sentiment > params["sentiment_threshold"]:
+                # Strong bullish sentiment
+                for i in range(len(result) - 1, max(0, len(result) - 5), -1):
+                    # Apply to recent data points
+                    result.loc[result.index[i], 'signal'] = 1
+                    result.loc[result.index[i], 'signal_strength'] = min(1.0, avg_sentiment / 10)
+            elif avg_sentiment < -params["sentiment_threshold"]:
+                # Strong bearish sentiment
+                for i in range(len(result) - 1, max(0, len(result) - 5), -1):
+                    # Apply to recent data points
+                    result.loc[result.index[i], 'signal'] = -1
+                    result.loc[result.index[i], 'signal_strength'] = min(1.0, abs(avg_sentiment) / 10)
+        except Exception as e:
+            print(f"Error in sentiment strategy: {e}")
+        
+        return result
+    
+    def enhanced_hybrid_strategy(self, df, params):
+        """Hybrid strategy combining technical and sentiment signals"""
+        # Get technical signals (MA crossover)
+        tech_params = {"short_period": 5, "long_period": 20}
+        tech_result = self.ma_crossover_strategy(df, tech_params)
+        
+        if tech_result is None:
+            return None
+            
+        # Get sentiment signals
+        sentiment_params = {"sentiment_threshold": 2.0, "lookback_days": 3}
+        sentiment_result = self.sentiment_strategy(df, sentiment_params)
+        
+        # Combine signals
+        result = tech_result.copy()
+        
+        # For each row where we have both technical and sentiment data
+        for i in range(len(result)):
+            tech_signal = tech_result['signal'].iloc[i]
+            tech_strength = tech_result['signal_strength'].iloc[i]
+            
+            sentiment_signal = 0
+            sentiment_strength = 0
+            
+            if i < len(sentiment_result):
+                sentiment_signal = sentiment_result['signal'].iloc[i]
+                sentiment_strength = sentiment_result['signal_strength'].iloc[i]
+            
+            # If both signals agree, boost the signal
+            if tech_signal != 0 and tech_signal == sentiment_signal:
+                # Weighted combination of signal strengths
+                combined_strength = (params["technical_weight"] * tech_strength + 
+                                     params["sentiment_weight"] * sentiment_strength)
+                result.loc[result.index[i], 'signal_strength'] = min(1.0, combined_strength)
+            elif sentiment_signal != 0 and tech_signal == 0:
+                # Only sentiment signal exists - apply with sentiment weight
+                result.loc[result.index[i], 'signal'] = sentiment_signal
+                result.loc[result.index[i], 'signal_strength'] = sentiment_strength * params["sentiment_weight"]
+            elif tech_signal != 0 and sentiment_signal == 0:
+                # Only technical signal exists - keep as is, scaled by technical weight
+                result.loc[result.index[i], 'signal_strength'] = tech_strength * params["technical_weight"]
+            elif tech_signal != 0 and sentiment_signal != 0 and tech_signal != sentiment_signal:
+                # Signals conflict - use the one with higher priority based on weights
+                if params["technical_weight"] >= params["sentiment_weight"]:
+                    # Technical signals have priority
+                    result.loc[result.index[i], 'signal'] = tech_signal
+                    result.loc[result.index[i], 'signal_strength'] = tech_strength * 0.7  # Reduce strength due to conflict
+                else:
+                    # Sentiment signals have priority
+                    result.loc[result.index[i], 'signal'] = sentiment_signal
+                    result.loc[result.index[i], 'signal_strength'] = sentiment_strength * 0.7  # Reduce strength due to conflict
+        
+        return result
+
+
 class PaperTrader:
     def __init__(self, initial_capital=10000):
         self.initial_capital = initial_capital
@@ -29,9 +300,11 @@ class PaperTrader:
         self.take_profit_pct = 10.0
         self.max_positions = 3
         self.save_interval = 30  # minutes
+        self.auto_save = True  # Added this flag to fix run_scheduler
         
         self.price_fetcher = CryptoPriceFetcher()
         self.analyzer = CryptoAnalyzer(self.price_fetcher)
+        self.strategy_manager = StrategyManager()
         
         self.data_dir = "paper_trading"
         os.makedirs(self.data_dir, exist_ok=True)
@@ -50,8 +323,9 @@ class PaperTrader:
         total_value = self.balance
         for symbol, position in self.positions.items():
             current_price = self._get_current_price(symbol)
-            position_value = position['quantity'] * current_price
-            total_value += position_value
+            if current_price is not None:  # Added check to prevent NoneType error
+                position_value = position['quantity'] * current_price
+                total_value += position_value
         
         # Create performance record
         record = {
@@ -107,7 +381,7 @@ class PaperTrader:
         # Calculate quantity based on position size if not provided
         if quantity is None:
             # Use percentage of available balance
-            position_value = self.balance * self.position_size_pct
+            position_value = self.balance * self.position_size_pct / 100  # Fixed: Convert percentage to decimal
             
             # If we have very little balance left, use all of it
             if position_value < 100:
@@ -223,17 +497,42 @@ class PaperTrader:
                 self.close_position(symbol, price, reason="Take Profit")
     
     def generate_signals(self, symbols=None):
-        """Generate trading signals for the specified symbols"""
+        """Generate trading signals for the specified symbols using the active strategy"""
         if symbols is None:
             symbols = ["BTC", "ETH", "SOL", "DOGE"]
         
         results = {}
+        
         for symbol in symbols:
-            try:
-                signals = self.analyzer.get_simple_signals(symbol)
-                results[symbol] = signals
-            except Exception as e:
-                print(f"Error generating signals for {symbol}: {e}")
+            # Get historical data
+            df = self.analyzer.convert_history_to_dataframe(symbol)
+            
+            if df is not None and len(df) > 10:  # Need at least some data points
+                # Apply strategy
+                if self.strategy_manager.active_strategy:
+                    signal_df = self.strategy_manager.generate_signals(df)
+                    
+                    if signal_df is not None:
+                        # Extract latest signals
+                        latest = signal_df.iloc[-1]
+                        results[symbol] = {
+                            'signal': latest.get('signal', 0),
+                            'signal_strength': latest.get('signal_strength', 0),
+                            'current_price': latest.get('price', 0)
+                        }
+                        
+                        logger.info(f"Signals for {symbol}: Signal={latest.get('signal', 0)}, Strength={latest.get('signal_strength', 0):.2f}")
+                else:
+                    # Use the default strategy from the analyzer
+                    signals = self.analyzer.get_simple_signals(symbol)
+                    if signals:
+                        results[symbol] = {
+                            'signal': 1 if "BULLISH" in str(signals) else (-1 if "BEARISH" in str(signals) else 0),
+                            'signal_strength': 0.5,  # Default strength
+                            'current_price': signals.get('price', 0)
+                        }
+            else:
+                logger.warning(f"Not enough data for signal generation for {symbol}")
         
         return results
     
@@ -241,6 +540,22 @@ class PaperTrader:
         """Process trading signals to make trade decisions"""
         for symbol, signal_data in signals.items():
             if "signals" not in signal_data:
+                # Check if we have the new format
+                if "signal" in signal_data:
+                    signal = signal_data["signal"]
+                    signal_strength = signal_data.get("signal_strength", 0.5)
+                    
+                    # Simple decision logic
+                    if symbol in self.positions:
+                        # Already have a position - check if we should close it
+                        if signal == -1 and signal_strength > 0.5:
+                            print(f"Strong sell signal for {symbol}, closing position")
+                            self.close_position(symbol, reason="Bearish Signal")
+                    else:
+                        # No position - check if we should open one
+                        if signal == 1 and signal_strength > 0.5:
+                            print(f"Strong buy signal for {symbol}, opening position")
+                            self.open_position(symbol)
                 continue
                 
             signal_list = signal_data["signals"]
@@ -514,6 +829,8 @@ class PaperTrader:
             'sell <symbol>': 'Sell the specified symbol',
             'signals <symbol>': 'Get trading signals for a symbol',
             'params': 'Show/edit trading parameters',
+            'strategies': 'List available trading strategies',
+            'strategy <name> [params]': 'Set active trading strategy',
             'plot': 'Plot account performance',
             'save': 'Save current state',
             'exit': 'Exit the program'
@@ -563,14 +880,17 @@ class PaperTrader:
                     continue
                     
                 symbol = parts[1].upper()
-                signals = self.analyzer.get_simple_signals(symbol)
+                signals = self.generate_signals([symbol])
                 
-                print(f"\nSignals for {symbol}:")
-                if "signals" in signals:
-                    for signal in signals["signals"]:
-                        print(f"  - {signal}")
+                if symbol in signals:
+                    signal = signals[symbol]
+                    signal_type = "BUY" if signal['signal'] == 1 else "SELL" if signal['signal'] == -1 else "NEUTRAL"
+                    print(f"\nSignals for {symbol}:")
+                    print(f"  Signal: {signal_type}")
+                    print(f"  Strength: {signal['signal_strength']:.2f}")
+                    print(f"  Current Price: ${signal['current_price']:.2f}")
                 else:
-                    print("  No signals generated")
+                    print(f"No signals generated for {symbol}")
                     
             elif cmd == 'params':
                 print("\nTrading Parameters:")
@@ -601,7 +921,51 @@ class PaperTrader:
                         print("Parameters updated")
                     except ValueError:
                         print("Invalid input. Parameters not updated.")
+                    
+            elif cmd == 'strategies':
+                available_strategies = self.strategy_manager.get_available_strategies()
+                active_strategy = self.strategy_manager.active_strategy
+                
+                print("\nAvailable Trading Strategies:")
+                for strategy in available_strategies:
+                    if strategy == active_strategy:
+                        print(f"  * {strategy} (ACTIVE)")
+                    else:
+                        print(f"  - {strategy}")
                         
+                print("\nUse 'strategy <name>' to set the active strategy")
+                
+            elif cmd.startswith('strategy '):
+                parts = cmd.split()
+                if len(parts) < 2:
+                    print("Usage: strategy <name> [params]")
+                    continue
+                    
+                strategy_name = parts[1]
+                
+                # Check if there are custom parameters (simple key=value format)
+                custom_params = {}
+                if len(parts) > 2:
+                    for param in parts[2:]:
+                        if '=' in param:
+                            key, value = param.split('=', 1)
+                            try:
+                                # Try to convert to appropriate type
+                                if value.isdigit():
+                                    value = int(value)
+                                elif '.' in value and all(c.isdigit() for c in value.replace('.', '', 1)):
+                                    value = float(value)
+                                custom_params[key] = value
+                            except ValueError:
+                                custom_params[key] = value
+                
+                if self.strategy_manager.set_active_strategy(strategy_name, custom_params):
+                    print(f"Strategy set to '{strategy_name}'")
+                    if custom_params:
+                        print("With custom parameters:", custom_params)
+                else:
+                    print(f"Failed to set strategy '{strategy_name}'")
+                    
             elif cmd == 'plot':
                 os.makedirs("charts", exist_ok=True)
                 chart_file = f"charts/paper_trading_performance.png"
@@ -621,10 +985,6 @@ class PaperTrader:
                 print("Type 'help' to see available commands")
 
 
-# Simple demonstration
-# Add this code to the end of paper_trader.py, replacing the existing __main__ block
-# This correctly handles the interval variable
-
 if __name__ == "__main__":
     print("Cryptocurrency Paper Trading System")
     print("----------------------------------")
@@ -638,6 +998,30 @@ if __name__ == "__main__":
     if load_state in ['y', 'yes']:
         trader.load_state()
     
+    # Select trading strategy
+    print("\nAvailable strategies:")
+    for i, strategy in enumerate(trader.strategy_manager.get_available_strategies()):
+        print(f"  {i+1}. {strategy}")
+    print("  0. Load external strategy")
+    
+    strategy_choice = input("\nSelect strategy (default: ma_crossover): ").strip()
+    
+    if strategy_choice == '0':
+        # Load external strategy
+        module_path = input("Enter strategy module path: ")
+        strategy_name = input("Enter strategy function name (optional): ") or None
+        loaded_strategy = trader.strategy_manager.load_external_strategy(module_path, strategy_name)
+        if loaded_strategy:
+            trader.strategy_manager.set_active_strategy(loaded_strategy)
+    elif strategy_choice.isdigit() and int(strategy_choice) > 0:
+        strategies = trader.strategy_manager.get_available_strategies()
+        idx = int(strategy_choice) - 1
+        if idx < len(strategies):
+            trader.strategy_manager.set_active_strategy(strategies[idx])
+    else:
+        # Default to MA crossover
+        trader.strategy_manager.set_active_strategy("ma_crossover")
+    
     # Select mode
     mode = input("Select mode (manual/auto, default: manual): ").lower()
     
@@ -645,15 +1029,6 @@ if __name__ == "__main__":
         # Set update interval
         interval_str = input("Update interval in minutes (default: 15): ")
         interval = int(interval_str) if interval_str.isdigit() else 15
-        
-        # Apply enhanced strategy if user wants
-        use_enhanced = input("Use enhanced strategy for limited data? (y/n, default: y): ").lower()
-        if use_enhanced != 'n':
-            try:
-                from enhanced_strategy import apply_enhanced_strategy
-                trader = apply_enhanced_strategy(trader)
-            except ImportError:
-                print("Enhanced strategy module not found. Using default strategy.")
         
         # Run in scheduled mode
         trader.run_scheduler(interval_minutes=interval)
