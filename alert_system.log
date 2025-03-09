@@ -33,3 +33,14 @@
 2025-03-08 11:56:17,387 - AlertSystem - INFO - Alert state saved
 2025-03-08 11:56:17,387 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
 2025-03-08 11:59:31,428 - AlertSystem - INFO - Alert system stopped by user
+2025-03-09 09:37:18,282 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-09 09:37:18,289 - AlertSystem - INFO - Database connection established
+2025-03-09 09:37:18,289 - AlertSystem - INFO - Alert state loaded
+2025-03-09 09:37:18,289 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-09 09:37:18,289 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-09 09:37:18,291 - AlertSystem - ERROR - Error retrieving recent sentiment: dictionary update sequence element #0 has length 10; 2 is required
+2025-03-09 09:37:18,293 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 09:37:18,294 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 09:37:18,295 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 09:37:18,295 - AlertSystem - INFO - Alert state saved
+2025-03-09 09:37:18,295 - AlertSystem - INFO - Alert check complete. Found 0 alerts.

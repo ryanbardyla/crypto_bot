@@ -1,0 +1,26 @@
+{
+  "vader_sentiment": {
+    "neg": 0.048,
+    "neu": 0.833,
+    "pos": 0.118,
+    "compound": 0.9998
+  },
+  "bullish_keywords": 18,
+  "bearish_keywords": 14,
+  "keyword_sentiment": 1.25,
+  "combined_score": 4.7492,
+  "mentioned_cryptos": [
+    "BTC",
+    "ETH",
+    "XRP",
+    "LINK",
+    "Bitcoin",
+    "Ethereum"
+  ],
+  "price_predictions": [],
+  "text_length": 19675,
+  "source": "youtube-nGUzGQGDWRc",
+  "timestamp": "2025-03-09 09:37:20",
+  "video_id": "nGUzGQGDWRc",
+  "title": "END OF Crypto Bull Market?! Here's The Hard TRUTH!!"
+}

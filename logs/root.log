@@ -1,0 +1,32 @@
+2025-03-09 09:35:59 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 09:35:59 - CryptoBotController - INFO - crypto_bot_controller.py:130 - Checking component status
+2025-03-09 09:37:04 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 09:37:04 - CryptoBotController - INFO - crypto_bot_controller.py:130 - Checking component status
+2025-03-09 09:37:17 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:107 - Starting all components
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:29 - Starting component: youtube-tracker
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:60 - Component youtube-tracker started in background
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:29 - Starting component: sentiment-ml
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:60 - Component sentiment-ml started in background
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:29 - Starting component: alert-system
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:60 - Component alert-system started in background
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:29 - Starting component: paper-trader
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:60 - Component paper-trader started in background
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:29 - Starting component: dashboard
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:60 - Component dashboard started in background
+2025-03-09 09:37:17 - CryptoBotController - INFO - crypto_bot_controller.py:115 - All components started
+2025-03-09 09:44:12 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:119 - Stopping all components
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: youtube-tracker
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component youtube-tracker stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: twitter-collector
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component twitter-collector stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: sentiment-ml
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component sentiment-ml stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: alert-system
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component alert-system stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: paper-trader
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component paper-trader stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: dashboard
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component dashboard stopped
+2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:126 - All components stopped
