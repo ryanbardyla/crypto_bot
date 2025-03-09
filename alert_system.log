@@ -24,3 +24,12 @@
 2025-03-08 03:16:22,672 - AlertSystem - INFO - Alert state saved
 2025-03-08 03:16:22,672 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
 2025-03-08 03:16:28,869 - AlertSystem - INFO - Alert system stopped by user
+2025-03-08 11:56:17,370 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-08 11:56:17,377 - AlertSystem - INFO - Database connection established
+2025-03-08 11:56:17,377 - AlertSystem - INFO - Alert state loaded
+2025-03-08 11:56:17,377 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-08 11:56:17,377 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-08 11:56:17,378 - AlertSystem - ERROR - Error retrieving recent sentiment: dictionary update sequence element #0 has length 10; 2 is required
+2025-03-08 11:56:17,387 - AlertSystem - INFO - Alert state saved
+2025-03-08 11:56:17,387 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
+2025-03-08 11:59:31,428 - AlertSystem - INFO - Alert system stopped by user

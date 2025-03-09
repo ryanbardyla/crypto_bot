@@ -1,0 +1,20 @@
+2025-03-08 18:08:27,169 - TradingStrategy - INFO - Strategy configuration loaded
+2025-03-08 18:08:27,176 - TradingStrategy - INFO - Database connection established to sqlite:///sentiment_database.db
+2025-03-08 18:08:27,176 - TradingStrategy - INFO - Running strategy for BTC
+2025-03-08 18:08:27,180 - TradingStrategy - INFO - Loaded 210 price points for BTC
+2025-03-08 18:08:27,183 - TradingStrategy - INFO - Retrieved sentiment data: 1 days for BTC
+2025-03-08 18:08:27,190 - TradingStrategy - INFO - Successfully integrated price and sentiment data for BTC
+2025-03-08 18:08:27,195 - TradingStrategy - INFO - Latest signal for BTC: NEUTRAL
+2025-03-08 18:08:27,551 - TradingStrategy - INFO - Saved signal chart to charts/BTC_strategy_20250308.png
+2025-03-08 18:08:48,220 - TradingStrategy - INFO - Running strategy for ETH
+2025-03-08 18:08:48,235 - TradingStrategy - INFO - Loaded 82 price points for ETH
+2025-03-08 18:08:48,243 - TradingStrategy - INFO - Retrieved sentiment data: 1 days for ETH
+2025-03-08 18:08:48,257 - TradingStrategy - INFO - Successfully integrated price and sentiment data for ETH
+2025-03-08 18:08:48,266 - TradingStrategy - INFO - Latest signal for ETH: NEUTRAL
+2025-03-08 18:08:48,590 - TradingStrategy - INFO - Saved signal chart to charts/ETH_strategy_20250308.png
+2025-03-08 18:08:54,061 - TradingStrategy - INFO - Running strategy for SOL
+2025-03-08 18:08:54,078 - TradingStrategy - INFO - Loaded 170 price points for SOL
+2025-03-08 18:08:54,088 - TradingStrategy - INFO - Retrieved sentiment data: 1 days for SOL
+2025-03-08 18:08:54,104 - TradingStrategy - INFO - Successfully integrated price and sentiment data for SOL
+2025-03-08 18:08:54,104 - TradingStrategy - WARNING - Insufficient data to generate signals for SOL
+2025-03-08 18:08:54,104 - TradingStrategy - INFO - Strategy results saved to strategy_signals_20250308_180854.json

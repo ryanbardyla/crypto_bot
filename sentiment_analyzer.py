@@ -1,155 +1,163 @@
-# sentiment_analyzer.py
-import os
+# sentiment_analyzer.py (updated version)
+
 import re
-import json
 import logging
 import nltk
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 
-
-# Configure logging
+# Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("SentimentAnalyzer")
 
 class SentimentAnalyzer:
-    """Analyze sentiment from video transcripts and text content"""
-    
     def __init__(self):
-        """Initialize the sentiment analyzer"""
-        # Download NLTK resources if not already present
+        # Initialize VADER sentiment analyzer
         try:
             nltk.data.find('vader_lexicon')
         except LookupError:
             nltk.download('vader_lexicon')
-        
+            
         self.sia = SentimentIntensityAnalyzer()
         
-        # Crypto-specific keyword dictionaries
+        # Define keywords for crypto sentiment analysis
         self.bullish_keywords = [
-            "bullish", "buy", "long", "support", "uptrend", "breakout", 
-            "accumulate", "moon", "upside", "bottom", "reversal",
-            "oversold", "undervalued", "adoption", "institutional"
+            "bullish", "buy", "buying", "long", "upward", "uptrend", "rising", 
+            "rally", "strong", "growth", "growing", "increase", "increasing", 
+            "higher", "breakout", "support", "accumulate", "bottom", "bullrun",
+            "gains", "profit", "successful", "opportunity", "potential", "bargain",
+            "undervalued", "correction", "buy the dip", "hodl", "moon", "outperform"
         ]
         
         self.bearish_keywords = [
-            "bearish", "sell", "short", "resistance", "downtrend", "breakdown", 
-            "distribute", "dump", "downside", "top", "correction",
-            "overbought", "overvalued", "regulation", "ban", "hack"
+            "bearish", "sell", "selling", "short", "downward", "downtrend", "falling", 
+            "decline", "weak", "decrease", "decreasing", "lower", "breakdown", "resistance", 
+            "dump", "top", "bear market", "crash", "collapsed", "bubble", "overvalued", 
+            "risky", "risk", "danger", "dangerous", "correction", "concern", "worried",
+            "warning", "fail", "failed", "scam", "manipulation", "manipulated"
         ]
-    
-    def _extract_youtube_id(self, url):
-        """Extract YouTube video ID from URL"""
-        youtube_regex = r"(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})"
-        match = re.search(youtube_regex, url)
         
+        # YouTube URL regex patterns
+        self.youtube_regex = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})'
+
+    def _extract_youtube_id(self, url):
+        """Extract YouTube video ID from URL."""
+        match = re.search(self.youtube_regex, url)
         if match:
             return match.group(1)
         return None
-    
+
     def get_youtube_transcript(self, url):
-        """Get transcript from a YouTube video"""
+        """Get transcript from YouTube video."""
         video_id = self._extract_youtube_id(url)
-        
         if not video_id:
             logger.error(f"Could not extract YouTube ID from {url}")
             return None
-        
-        try:
-            # This would normally use YouTubeTranscriptApi, but we'll make a simplified version
-            # that doesn't require the external dependency for now
-            transcript_text = f"Placeholder transcript for video {video_id}"
             
+        try:
+            transcript_list = YouTubeTranscriptApi.get_transcript(video_id)
+            transcript_text = ' '.join([item['text'] for item in transcript_list])
             logger.info(f"Retrieved transcript for YouTube video {video_id}: {len(transcript_text)} characters")
             return transcript_text
-            
+        except TranscriptsDisabled:
+            logger.warning(f"Transcripts are disabled for video {video_id}")
+            return None
         except Exception as e:
             logger.error(f"Error retrieving YouTube transcript: {e}")
             return None
-    
+
     def analyze_sentiment(self, text):
-        """
-        Analyze sentiment of text
-        
-        Returns:
-            dict: Sentiment scores
-        """
-        if not text:
-            return None
-        
-        # Get VADER sentiment
+        """Analyze sentiment of text using VADER and keyword analysis."""
+        # VADER sentiment analysis
         sentiment = self.sia.polarity_scores(text)
         
-        # Count crypto-specific keywords
+        # Keyword-based sentiment analysis
         bullish_count = sum(1 for keyword in self.bullish_keywords if keyword.lower() in text.lower())
         bearish_count = sum(1 for keyword in self.bearish_keywords if keyword.lower() in text.lower())
         
-        # Normalize to get a score from -10 to 10 (bearish to bullish)
-        keyword_sentiment = ((bullish_count - bearish_count) / max(1, bullish_count + bearish_count)) * 10
+        # Calculate keyword sentiment score (scale -10 to 10)
+        keyword_difference = bullish_count - bearish_count
+        keyword_total = bullish_count + bearish_count
+        keyword_sentiment = 0
+        if keyword_total > 0:
+            keyword_sentiment = (keyword_difference / keyword_total) * 10
+            
+        # Combine VADER and keyword sentiment
+        # VADER compound score ranges from -1 to 1, multiply by 5 for -5 to 5 scale
+        vader_scaled = sentiment['compound'] * 5
         
-        # Combine VADER compound score (ranges from -1 to 1) with our keyword sentiment
-        combined_score = (sentiment['compound'] * 5) + (keyword_sentiment * 0.5)
+        # Combined score - weighted average (50% VADER, 50% keyword)
+        combined_score = (vader_scaled + keyword_sentiment) / 2
         
-        # Clamp between -10 and 10
+        # Ensure combined score stays within -10 to 10 range
         combined_score = max(-10, min(10, combined_score))
         
-        result = {
-            'vader_sentiment': sentiment,
-            'bullish_keywords': bullish_count,
-            'bearish_keywords': bearish_count,
-            'keyword_sentiment': keyword_sentiment,
-            'combined_score': combined_score
+        return {
+            "vader_sentiment": sentiment,
+            "bullish_keywords": bullish_count,
+            "bearish_keywords": bearish_count,
+            "keyword_sentiment": keyword_sentiment,
+            "combined_score": combined_score
         }
-        
-        return result
-    
+
     def analyze_youtube_video(self, url):
-        """
-        Analyze sentiment of a YouTube video
-        
-        Args:
-            url: YouTube video URL
-            
-        Returns:
-            dict: Sentiment analysis results
-        """
+        """Analyze sentiment of a YouTube video transcript."""
         transcript = self.get_youtube_transcript(url)
-        
         if not transcript:
             return None
-        
+            
         sentiment = self.analyze_sentiment(transcript)
-        
-        if sentiment:
-            sentiment['url'] = url
-            sentiment['transcript_length'] = len(transcript)
-            
-            logger.info(f"Sentiment analysis for {url}: {sentiment['combined_score']:.2f}")
-            
-            return sentiment
-        
-        return None
-    
+        sentiment['text_length'] = len(transcript)
+        sentiment['transcript'] = transcript  # Include full transcript
+        sentiment['video_id'] = self._extract_youtube_id(url)
+        logger.info(f"Sentiment analysis for {url}: {sentiment['combined_score']:.2f}")
+        return sentiment
+
     def analyze_text(self, text, source=None):
-        """
-        Analyze sentiment of text content
-        
-        Args:
-            text: Text content to analyze
-            source: Optional source identifier
+        """Analyze sentiment of any text."""
+        if not text:
+            return {"combined_score": 0, "vader_sentiment": {"compound": 0, "neg": 0, "neu": 1, "pos": 0}}
             
-        Returns:
-            dict: Sentiment analysis results
-        """
         sentiment = self.analyze_sentiment(text)
-        
-        if sentiment:
-            if source:
-                sentiment['source'] = source
+        sentiment['text_length'] = len(text)
+        if source:
+            sentiment['source'] = source
             
-            sentiment['text_length'] = len(text)
-            
-            logger.info(f"Sentiment analysis: {sentiment['combined_score']:.2f}")
-            
-            return sentiment
-        
-        return None
+        logger.info(f"Sentiment analysis: {sentiment['combined_score']:.2f}")
+        return sentiment
+
+# If run directly, perform a simple test
+if __name__ == "__main__":
+    analyzer = SentimentAnalyzer()
+    
+    # Test with a sample text
+    test_text = """
+    Bitcoin is looking incredibly bullish right now. The technical indicators are showing 
+    strong support levels and I think we're going to see a significant rally in the coming weeks.
+    Smart money is accumulating while weak hands are selling. This is a great opportunity to buy the dip
+    and hold for the long term. I'm very optimistic about the future price action.
+    """
+    
+    result = analyzer.analyze_text(test_text)
+    print("\nText sentiment analysis:")
+    print(f"VADER: {result['vader_sentiment']}")
+    print(f"Bullish keywords: {result['bullish_keywords']}")
+    print(f"Bearish keywords: {result['bearish_keywords']}")
+    print(f"Keyword sentiment: {result['keyword_sentiment']:.2f}")
+    print(f"Combined score: {result['combined_score']:.2f}")
+    
+    # Test with a YouTube URL (if provided as argument)
+    import sys
+    if len(sys.argv) > 1:
+        youtube_url = sys.argv[1]
+        print(f"\nAnalyzing YouTube video: {youtube_url}")
+        video_result = analyzer.analyze_youtube_video(youtube_url)
+        if video_result:
+            print(f"VADER: {video_result['vader_sentiment']}")
+            print(f"Bullish keywords: {video_result['bullish_keywords']}")
+            print(f"Bearish keywords: {video_result['bearish_keywords']}")
+            print(f"Keyword sentiment: {video_result['keyword_sentiment']:.2f}")
+            print(f"Combined score: {video_result['combined_score']:.2f}")
+            print(f"Text length: {video_result['text_length']}")
+        else:
+            print("Could not analyze video. Check if it has available transcripts.")

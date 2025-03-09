@@ -1,0 +1,12 @@
+{
+    "db_path": "sqlite:///sentiment_database.db",
+    "symbols": ["BTC", "ETH", "SOL"],
+    "sentiment_lookback_days": 7,
+    "sentiment_weight": 0.6,
+    "price_weight": 0.4,
+    "sentiment_threshold": 2.0,
+    "volatility_adjustment": true,
+    "max_position_size": 0.2,
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.1
+  }

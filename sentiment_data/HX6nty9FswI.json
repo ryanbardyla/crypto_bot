@@ -1,0 +1,17 @@
+{
+  "vader_sentiment": {
+    "neg": 0.043,
+    "neu": 0.823,
+    "pos": 0.133,
+    "compound": 0.9998
+  },
+  "bullish_keywords": 12,
+  "bearish_keywords": 6,
+  "keyword_sentiment": 3.333333333333333,
+  "combined_score": 4.166166666666667,
+  "text_length": 14566,
+  "source": "youtube-HX6nty9FswI",
+  "timestamp": "2025-03-08 17:40:30",
+  "video_id": "HX6nty9FswI",
+  "title": "TRUTH about Crypto White House Summit DUMPING Bitcoin! (Why you shouldn\u2019t worry)"
+}

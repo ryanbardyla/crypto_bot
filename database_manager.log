@@ -1,0 +1,92 @@
+2025-03-08 11:51:15,962 - DataMigration - INFO - Created backup directory sentiment_data_backup
+2025-03-08 11:51:15,962 - DataMigration - INFO - Backing up 41 JSON files to sentiment_data_backup
+2025-03-08 11:51:15,971 - DataMigration - INFO - Backup completed: 41 files backed up to sentiment_data_backup
+2025-03-08 11:51:16,238 - DatabaseManager - INFO - Database connection established successfully
+2025-03-08 11:51:16,238 - DataMigration - INFO - Found 41 JSON files to migrate
+2025-03-08 11:51:16,292 - DatabaseManager - INFO - Successfully saved youtube record IveeKmJVrng
+2025-03-08 11:51:16,330 - DatabaseManager - INFO - Successfully saved youtube record 9NRi9SnRvlo
+2025-03-08 11:51:16,354 - DatabaseManager - INFO - Successfully saved youtube record -DgYnfY-bzs
+2025-03-08 11:51:16,391 - DatabaseManager - INFO - Successfully saved youtube record uKDsRvtVX2s
+2025-03-08 11:51:16,414 - DatabaseManager - INFO - Successfully saved youtube record aMEPDBBhGBk
+2025-03-08 11:51:16,437 - DatabaseManager - INFO - Successfully saved youtube record W_Z9Zn9DpYk
+2025-03-08 11:51:16,464 - DatabaseManager - INFO - Successfully saved youtube record bexxPkmQJIc
+2025-03-08 11:51:16,487 - DatabaseManager - INFO - Successfully saved youtube record 0AcO3X9I1qQ
+2025-03-08 11:51:16,511 - DatabaseManager - INFO - Successfully saved youtube record ePYssvU1yTQ
+2025-03-08 11:51:16,534 - DatabaseManager - INFO - Successfully saved youtube record -eKCZ5C08Xs
+2025-03-08 11:51:16,556 - DatabaseManager - INFO - Successfully saved youtube record c3l0gfv_gO4
+2025-03-08 11:51:16,579 - DatabaseManager - INFO - Successfully saved youtube record N0-tDUNFjtU
+2025-03-08 11:51:16,602 - DatabaseManager - INFO - Successfully saved youtube record AmDVsysmUBE
+2025-03-08 11:51:16,625 - DatabaseManager - INFO - Successfully saved youtube record OUJtYKd9-sc
+2025-03-08 11:51:16,648 - DatabaseManager - INFO - Successfully saved youtube record mlyT4z59kfs
+2025-03-08 11:51:16,671 - DatabaseManager - INFO - Successfully saved youtube record vAMDf8NCLgU
+2025-03-08 11:51:16,694 - DatabaseManager - INFO - Successfully saved youtube record xWf8yW_x5ZA
+2025-03-08 11:51:16,725 - DatabaseManager - INFO - Successfully saved youtube record WUESSbDJi6Y
+2025-03-08 11:51:16,749 - DatabaseManager - INFO - Successfully saved youtube record 7Vaw1lYQUIo
+2025-03-08 11:51:16,772 - DatabaseManager - INFO - Successfully saved youtube record q1tLnU_UzUg
+2025-03-08 11:51:16,796 - DatabaseManager - INFO - Successfully saved youtube record jyoiULP0CP4
+2025-03-08 11:51:16,820 - DatabaseManager - INFO - Successfully saved youtube record 9SF3eVZW68w
+2025-03-08 11:51:16,848 - DatabaseManager - INFO - Successfully saved youtube record AcHY9dnPaUA
+2025-03-08 11:51:16,873 - DatabaseManager - INFO - Successfully saved youtube record ZcjrlHgGhwY
+2025-03-08 11:51:16,912 - DatabaseManager - INFO - Successfully saved youtube record MtwVPofVK2g
+2025-03-08 11:51:16,936 - DatabaseManager - INFO - Successfully saved youtube record RDntm-d8zNY
+2025-03-08 11:51:16,964 - DatabaseManager - INFO - Successfully saved youtube record Pii0q0bGLIc
+2025-03-08 11:51:16,987 - DatabaseManager - INFO - Successfully saved youtube record ErfJAyfNLQY
+2025-03-08 11:51:17,010 - DatabaseManager - INFO - Successfully saved youtube record oM5VA2U3jHw
+2025-03-08 11:51:17,039 - DatabaseManager - INFO - Successfully saved youtube record pJNu0C1Fs6M
+2025-03-08 11:51:17,062 - DatabaseManager - INFO - Successfully saved youtube record 9yBungOFifs
+2025-03-08 11:51:17,088 - DatabaseManager - INFO - Successfully saved youtube record _REkixuK2bQ
+2025-03-08 11:51:17,111 - DatabaseManager - INFO - Successfully saved youtube record eeOiPCLkDbI
+2025-03-08 11:51:17,142 - DatabaseManager - INFO - Successfully saved youtube record OUliwGZg-98
+2025-03-08 11:51:17,169 - DatabaseManager - INFO - Successfully saved youtube record UY0jYICkvX8
+2025-03-08 11:51:17,193 - DatabaseManager - INFO - Successfully saved youtube record qWKASqMdmcg
+2025-03-08 11:51:17,217 - DatabaseManager - INFO - Successfully saved youtube record VYZeoKoyw2k
+2025-03-08 11:51:17,245 - DatabaseManager - INFO - Successfully saved youtube record u-EeeBe-ZCY
+2025-03-08 11:51:17,270 - DatabaseManager - INFO - Successfully saved youtube record RwRRqkzN4uE
+2025-03-08 11:51:17,293 - DatabaseManager - INFO - Successfully saved youtube record ZNfNMNsXWi0
+2025-03-08 11:51:17,316 - DatabaseManager - INFO - Successfully saved youtube record Ubr7G_keJds
+2025-03-08 11:51:17,316 - DataMigration - INFO - Migration completed: 41 successful, 0 failed out of 41
+2025-03-08 11:51:17,318 - DatabaseManager - INFO - Database connection established successfully
+2025-03-08 11:51:17,318 - DataMigration - INFO - Verifying migration of 41 JSON files
+2025-03-08 11:51:17,318 - DataMigration - ERROR - Error verifying IveeKmJVrng.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying 9NRi9SnRvlo.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying -DgYnfY-bzs.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying uKDsRvtVX2s.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying aMEPDBBhGBk.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying W_Z9Zn9DpYk.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying bexxPkmQJIc.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,319 - DataMigration - ERROR - Error verifying 0AcO3X9I1qQ.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying ePYssvU1yTQ.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying -eKCZ5C08Xs.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying c3l0gfv_gO4.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying N0-tDUNFjtU.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying AmDVsysmUBE.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying OUJtYKd9-sc.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,320 - DataMigration - ERROR - Error verifying mlyT4z59kfs.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying vAMDf8NCLgU.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying xWf8yW_x5ZA.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying WUESSbDJi6Y.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying 7Vaw1lYQUIo.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying q1tLnU_UzUg.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying jyoiULP0CP4.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying 9SF3eVZW68w.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying AcHY9dnPaUA.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,321 - DataMigration - ERROR - Error verifying ZcjrlHgGhwY.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying MtwVPofVK2g.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying RDntm-d8zNY.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying Pii0q0bGLIc.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying ErfJAyfNLQY.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying oM5VA2U3jHw.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying pJNu0C1Fs6M.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying 9yBungOFifs.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying _REkixuK2bQ.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,322 - DataMigration - ERROR - Error verifying eeOiPCLkDbI.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying OUliwGZg-98.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying UY0jYICkvX8.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying qWKASqMdmcg.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying VYZeoKoyw2k.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying u-EeeBe-ZCY.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying RwRRqkzN4uE.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying ZNfNMNsXWi0.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - ERROR - Error verifying Ubr7G_keJds.json: DatabaseManager.get_sentiment_data() got an unexpected keyword argument 'record_id'
+2025-03-08 11:51:17,323 - DataMigration - WARNING - Verification found 41 files not properly migrated
+2025-03-08 11:51:52,770 - DatabaseManager - INFO - Database connection established successfully

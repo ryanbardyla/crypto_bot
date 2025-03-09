@@ -1,0 +1,28 @@
+{
+  "timestamp": "2025-03-08 18:08:54",
+  "signals": {
+    "BTC": {
+      "date": "2025-03-08",
+      "price": 86258.91827448164,
+      "sentiment_score": 0.0,
+      "signal": 0,
+      "signal_strength": 0.0,
+      "position_size": 0.0,
+      "stop_loss": 0.0,
+      "take_profit": 0.0
+    },
+    "ETH": {
+      "date": "2025-03-08",
+      "price": 2204.633731141806,
+      "sentiment_score": 0.0,
+      "signal": 0,
+      "signal_strength": 0.0,
+      "position_size": 0.0,
+      "stop_loss": 0.0,
+      "take_profit": 0.0
+    },
+    "SOL": {
+      "error": "Insufficient data"
+    }
+  }
+}

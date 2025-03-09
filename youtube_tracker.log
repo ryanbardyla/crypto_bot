@@ -1,0 +1,244 @@
+ERROR:YouTubeTracker:Failed to set up database: Invalid SQLite URL: sqlite://sentiment_database.db
+Valid SQLite URL forms are:
+ sqlite:///:memory: (or, sqlite://)
+ sqlite:///relative/path/to/file.db
+ sqlite:////absolute/path/to/file.db
+ERROR:YouTubeTracker:Failed to load configuration: Extra data: line 17 column 4 (char 527)
+WARNING:YouTubeTracker:No channel found for ID: UC-f4b-Z-sURs9vOcs_ykd8g
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC-f4b-Z-sURs9vOcs_ykd8g
+WARNING:YouTubeTracker:No channel found for ID: UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:No channel found for ID: UCiL7A_15FgzRTJNrQdZPqEA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCiL7A_15FgzRTJNrQdZPqEA
+WARNING:YouTubeTracker:No channel found for ID: UC-f4b-Z-sURs9vOcs_ykd8g
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC-f4b-Z-sURs9vOcs_ykd8g
+WARNING:YouTubeTracker:No channel found for ID: UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:No channel found for ID: UCiL7A_15FgzRTJNrQdZPqEA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCiL7A_15FgzRTJNrQdZPqEA
+WARNING:YouTubeTracker:No channel found for ID: UChhUV8p0nSjv3AYUEsGOOHQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UChhUV8p0nSjv3AYUEsGOOHQ
+WARNING:YouTubeTracker:No channel found for ID: UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:No channel found for ID: UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:No channel found for ID: UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:No channel found for ID: UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:No channel found for ID: UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:No channel found for ID: UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:No channel found for ID: UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:No channel found for ID: UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:No channel found for ID: UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:No channel found for ID: UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:No channel found for ID: UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:No channel found for ID: UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:No channel found for ID: UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:No channel found for ID: UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:No channel found for ID: UCw-VjEDSn69kuI4VdYwmKLw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCw-VjEDSn69kuI4VdYwmKLw
+WARNING:YouTubeTracker:No channel found for ID: UC2qrUzn9Xs6PVIge0IaEkXg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC2qrUzn9Xs6PVIge0IaEkXg
+ERROR:YouTubeTracker:Failed to set up database: Invalid SQLite URL: sqlite://./sentiment_database.db
+Valid SQLite URL forms are:
+ sqlite:///:memory: (or, sqlite://)
+ sqlite:///relative/path/to/file.db
+ sqlite:////absolute/path/to/file.db
+WARNING:YouTubeTracker:No channel found for ID: UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:No channel found for ID: UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:No channel found for ID: UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:No channel found for ID: UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:No channel found for ID: UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:No channel found for ID: UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:No channel found for ID: UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:No channel found for ID: UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:No channel found for ID: UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:No channel found for ID: UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:No channel found for ID: UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:No channel found for ID: UC2qrUzn9Xs6PVIge0IaEkXg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC2qrUzn9Xs6PVIge0IaEkXg
+WARNING:YouTubeTracker:No channel found for ID: UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:No channel found for ID: UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:No channel found for ID: UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:No channel found for ID: UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:No channel found for ID: UCw-VjEDSn69kuI4VdYwmKLw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCw-VjEDSn69kuI4VdYwmKLw
+WARNING:YouTubeTracker:No channel found for ID: UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCByrKqz72bVunGgpBJe-ltg
+WARNING:YouTubeTracker:No channel found for ID: UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCdqoqtAaV5Migag9ApSMTdQ
+WARNING:YouTubeTracker:No channel found for ID: UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCm0hRw_xtRWq9kFQIhb_eBQ
+WARNING:YouTubeTracker:No channel found for ID: UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC8vja18yXlLLdWXBUrWcjDg
+WARNING:YouTubeTracker:No channel found for ID: UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCboyb4svb9Y5Mu6BM4EhTgg
+WARNING:YouTubeTracker:No channel found for ID: UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC67AEQHAOKgGSYSIV2bBWh7A
+WARNING:YouTubeTracker:No channel found for ID: UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCVVPxFvxY8hA9gMbjgKIpgw
+WARNING:YouTubeTracker:No channel found for ID: UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCyqNj8w5UdlsYpzMI6o6ycA
+WARNING:YouTubeTracker:No channel found for ID: UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCRhw4-Ia4_LUCWvQLKbm8Og
+WARNING:YouTubeTracker:No channel found for ID: UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCDg1M9V3TVpWf4Yk7K19jVQ
+WARNING:YouTubeTracker:No channel found for ID: UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCepBEh01sC9migrAChd1PUQ
+WARNING:YouTubeTracker:No channel found for ID: UC2qrUzn9Xs6PVIge0IaEkXg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC2qrUzn9Xs6PVIge0IaEkXg
+WARNING:YouTubeTracker:No channel found for ID: UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCu2nkSAIoMSGhbENRBbWTkw
+WARNING:YouTubeTracker:No channel found for ID: UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UC4zU8VEU8OrcWmz1P0gvWdA
+WARNING:YouTubeTracker:No channel found for ID: UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCx_rqR_fX3WSkMnAyaZC0Aw
+WARNING:YouTubeTracker:No channel found for ID: UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCrYT1Ov5r9Kl0Uy-HqsHHLg
+WARNING:YouTubeTracker:No channel found for ID: UCw-VjEDSn69kuI4VdYwmKLw
+WARNING:YouTubeTracker:Could not get uploads playlist for channel UCw-VjEDSn69kuI4VdYwmKLw
+2025-03-08 17:40:18,652 - YouTubeTracker - INFO - Tracking 21 YouTube channels
+2025-03-08 17:40:18,652 - YouTubeTracker - INFO - Configuration loaded: check interval 24h, video age limit 30 days
+2025-03-08 17:40:18,655 - YouTubeTracker - INFO - YouTube API client initialized successfully
+2025-03-08 17:40:18,664 - YouTubeTracker - INFO - Database connection established at sqlite:///sentiment_database.db
+2025-03-08 17:40:19,577 - YouTubeTracker - INFO - Starting YouTube tracker scheduler with 24 hour interval
+2025-03-08 17:40:19,577 - YouTubeTracker - INFO - Starting YouTube tracker run
+2025-03-08 17:40:19,577 - YouTubeTracker - INFO - Processing channel: Coin Bureau (ID: UCqK_GSMbpiV8spgD3ZGloSw)
+2025-03-08 17:40:19,786 - YouTubeTracker - INFO - Found uploads playlist UUqK_GSMbpiV8spgD3ZGloSw for channel UCqK_GSMbpiV8spgD3ZGloSw
+2025-03-08 17:40:19,907 - YouTubeTracker - INFO - Retrieved 10 recent videos from playlist UUqK_GSMbpiV8spgD3ZGloSw
+2025-03-08 17:40:19,908 - YouTubeTracker - INFO - Found 10 recent videos from Coin Bureau
+2025-03-08 17:40:19,928 - YouTubeTracker - INFO - Video qWKASqMdmcg already processed - skipping
+2025-03-08 17:40:19,930 - YouTubeTracker - INFO - Video jyoiULP0CP4 already processed - skipping
+2025-03-08 17:40:19,932 - YouTubeTracker - INFO - Video Ubr7G_keJds already processed - skipping
+2025-03-08 17:40:19,934 - YouTubeTracker - INFO - Video 9SF3eVZW68w already processed - skipping
+2025-03-08 17:40:19,935 - YouTubeTracker - INFO - Video RDntm-d8zNY already processed - skipping
+2025-03-08 17:40:19,936 - YouTubeTracker - INFO - Video ZNfNMNsXWi0 already processed - skipping
+2025-03-08 17:40:19,937 - YouTubeTracker - INFO - Video ZcjrlHgGhwY already processed - skipping
+2025-03-08 17:40:19,938 - YouTubeTracker - INFO - Video AmDVsysmUBE already processed - skipping
+2025-03-08 17:40:19,939 - YouTubeTracker - INFO - Video ErfJAyfNLQY already processed - skipping
+2025-03-08 17:40:19,940 - YouTubeTracker - INFO - Video IveeKmJVrng already processed - skipping
+2025-03-08 17:40:21,940 - YouTubeTracker - INFO - Processing channel: Jacob Bury (ID: UCw2OA30Mobztf52r-dpYYTA)
+2025-03-08 17:40:22,049 - YouTubeTracker - INFO - Found uploads playlist UUw2OA30Mobztf52r-dpYYTA for channel UCw2OA30Mobztf52r-dpYYTA
+2025-03-08 17:40:22,776 - YouTubeTracker - INFO - Retrieved 10 recent videos from playlist UUw2OA30Mobztf52r-dpYYTA
+2025-03-08 17:40:22,776 - YouTubeTracker - INFO - Found 10 recent videos from Jacob Bury
+2025-03-08 17:40:23,632 - YouTubeTracker - INFO - Successfully retrieved transcript for video 33qzr-xLV7s: 555 characters
+2025-03-08 17:40:23,636 - SentimentAnalyzer - INFO - Sentiment analysis: 7.41
+2025-03-08 17:40:23,670 - YouTubeTracker - INFO - Successfully processed video 33qzr-xLV7s - Score: 7.41
+2025-03-08 17:40:23,673 - YouTubeTracker - INFO - Video vAMDf8NCLgU already processed - skipping
+2025-03-08 17:40:23,675 - YouTubeTracker - INFO - Video _REkixuK2bQ already processed - skipping
+2025-03-08 17:40:23,678 - YouTubeTracker - INFO - Video OUliwGZg-98 already processed - skipping
+2025-03-08 17:40:23,680 - YouTubeTracker - INFO - Video N0-tDUNFjtU already processed - skipping
+2025-03-08 17:40:23,683 - YouTubeTracker - INFO - Video mlyT4z59kfs already processed - skipping
+2025-03-08 17:40:23,685 - YouTubeTracker - INFO - Video MtwVPofVK2g already processed - skipping
+2025-03-08 17:40:23,688 - YouTubeTracker - INFO - Video -DgYnfY-bzs already processed - skipping
+2025-03-08 17:40:23,690 - YouTubeTracker - INFO - Video VYZeoKoyw2k already processed - skipping
+2025-03-08 17:40:23,692 - YouTubeTracker - INFO - Video uKDsRvtVX2s already processed - skipping
+2025-03-08 17:40:25,693 - YouTubeTracker - INFO - Processing channel: Benjamin Cowen (ID: UCByrKqz72bVunGgpBJe-ltg)
+2025-03-08 17:40:25,772 - YouTubeTracker - WARNING - No channel found for ID: UCByrKqz72bVunGgpBJe-ltg
+2025-03-08 17:40:25,772 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Benjamin Cowen - skipping
+2025-03-08 17:40:25,772 - YouTubeTracker - INFO - Processing channel: Michael Wrubel (ID: UCdqoqtAaV5Migag9ApSMTdQ)
+2025-03-08 17:40:25,874 - YouTubeTracker - WARNING - No channel found for ID: UCdqoqtAaV5Migag9ApSMTdQ
+2025-03-08 17:40:25,874 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Michael Wrubel - skipping
+2025-03-08 17:40:25,874 - YouTubeTracker - INFO - Processing channel: Crypto Banter (ID: UCm0hRw_xtRWq9kFQIhb_eBQ)
+2025-03-08 17:40:25,946 - YouTubeTracker - WARNING - No channel found for ID: UCm0hRw_xtRWq9kFQIhb_eBQ
+2025-03-08 17:40:25,946 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Crypto Banter - skipping
+2025-03-08 17:40:25,946 - YouTubeTracker - INFO - Processing channel: Crypto ZEUS (ID: UC8vja18yXlLLdWXBUrWcjDg)
+2025-03-08 17:40:26,035 - YouTubeTracker - WARNING - No channel found for ID: UC8vja18yXlLLdWXBUrWcjDg
+2025-03-08 17:40:26,035 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Crypto ZEUS - skipping
+2025-03-08 17:40:26,035 - YouTubeTracker - INFO - Processing channel: Crypto Kirby (ID: UCboyb4svb9Y5Mu6BM4EhTgg)
+2025-03-08 17:40:26,111 - YouTubeTracker - WARNING - No channel found for ID: UCboyb4svb9Y5Mu6BM4EhTgg
+2025-03-08 17:40:26,112 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Crypto Kirby - skipping
+2025-03-08 17:40:26,112 - YouTubeTracker - INFO - Processing channel: Crypto Zombie (ID: UC67AEQHAOKgGSYSIV2bBWh7A)
+2025-03-08 17:40:26,203 - YouTubeTracker - WARNING - No channel found for ID: UC67AEQHAOKgGSYSIV2bBWh7A
+2025-03-08 17:40:26,203 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Crypto Zombie - skipping
+2025-03-08 17:40:26,204 - YouTubeTracker - INFO - Processing channel: The Moon (ID: UCVVPxFvxY8hA9gMbjgKIpgw)
+2025-03-08 17:40:26,263 - YouTubeTracker - WARNING - No channel found for ID: UCVVPxFvxY8hA9gMbjgKIpgw
+2025-03-08 17:40:26,263 - YouTubeTracker - WARNING - Could not get uploads playlist for channel The Moon - skipping
+2025-03-08 17:40:26,264 - YouTubeTracker - INFO - Processing channel: Crypto Jebb (ID: UCyqNj8w5UdlsYpzMI6o6ycA)
+2025-03-08 17:40:26,345 - YouTubeTracker - WARNING - No channel found for ID: UCyqNj8w5UdlsYpzMI6o6ycA
+2025-03-08 17:40:26,345 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Crypto Jebb - skipping
+2025-03-08 17:40:26,345 - YouTubeTracker - INFO - Processing channel: Ivan on Tech (ID: UCRhw4-Ia4_LUCWvQLKbm8Og)
+2025-03-08 17:40:26,434 - YouTubeTracker - WARNING - No channel found for ID: UCRhw4-Ia4_LUCWvQLKbm8Og
+2025-03-08 17:40:26,434 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Ivan on Tech - skipping
+2025-03-08 17:40:26,434 - YouTubeTracker - INFO - Processing channel: Altcoin Daily (ID: UCDg1M9V3TVpWf4Yk7K19jVQ)
+2025-03-08 17:40:26,501 - YouTubeTracker - WARNING - No channel found for ID: UCDg1M9V3TVpWf4Yk7K19jVQ
+2025-03-08 17:40:26,501 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Altcoin Daily - skipping
+2025-03-08 17:40:26,501 - YouTubeTracker - INFO - Processing channel: 99Bitcoins (ID: UCepBEh01sC9migrAChd1PUQ)
+2025-03-08 17:40:26,561 - YouTubeTracker - WARNING - No channel found for ID: UCepBEh01sC9migrAChd1PUQ
+2025-03-08 17:40:26,561 - YouTubeTracker - WARNING - Could not get uploads playlist for channel 99Bitcoins - skipping
+2025-03-08 17:40:26,562 - YouTubeTracker - INFO - Processing channel: Sheldon Evans (ID: UC2qrUzn9Xs6PVIge0IaEkXg)
+2025-03-08 17:40:26,661 - YouTubeTracker - WARNING - No channel found for ID: UC2qrUzn9Xs6PVIge0IaEkXg
+2025-03-08 17:40:26,661 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Sheldon Evans - skipping
+2025-03-08 17:40:26,662 - YouTubeTracker - INFO - Processing channel: Kitco News (ID: UC9ijza42jVR3T6b8bColgvg)
+2025-03-08 17:40:26,723 - YouTubeTracker - INFO - Found uploads playlist UU9ijza42jVR3T6b8bColgvg for channel UC9ijza42jVR3T6b8bColgvg
+2025-03-08 17:40:26,853 - YouTubeTracker - INFO - Retrieved 10 recent videos from playlist UU9ijza42jVR3T6b8bColgvg
+2025-03-08 17:40:26,853 - YouTubeTracker - INFO - Found 10 recent videos from Kitco News
+2025-03-08 17:40:26,855 - YouTubeTracker - INFO - Video pJNu0C1Fs6M already processed - skipping
+2025-03-08 17:40:26,857 - YouTubeTracker - INFO - Video xWf8yW_x5ZA already processed - skipping
+2025-03-08 17:40:26,858 - YouTubeTracker - INFO - Video 7Vaw1lYQUIo already processed - skipping
+2025-03-08 17:40:26,859 - YouTubeTracker - INFO - Video ePYssvU1yTQ already processed - skipping
+2025-03-08 17:40:26,861 - YouTubeTracker - INFO - Video oM5VA2U3jHw already processed - skipping
+2025-03-08 17:40:26,863 - YouTubeTracker - INFO - Video eeOiPCLkDbI already processed - skipping
+2025-03-08 17:40:26,865 - YouTubeTracker - INFO - Video RwRRqkzN4uE already processed - skipping
+2025-03-08 17:40:26,866 - YouTubeTracker - INFO - Video 9yBungOFifs already processed - skipping
+2025-03-08 17:40:26,867 - YouTubeTracker - INFO - Video c3l0gfv_gO4 already processed - skipping
+2025-03-08 17:40:26,868 - YouTubeTracker - INFO - Video UY0jYICkvX8 already processed - skipping
+2025-03-08 17:40:28,868 - YouTubeTracker - INFO - Processing channel: Lark Davis (ID: UCu2nkSAIoMSGhbENRBbWTkw)
+2025-03-08 17:40:28,945 - YouTubeTracker - WARNING - No channel found for ID: UCu2nkSAIoMSGhbENRBbWTkw
+2025-03-08 17:40:28,946 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Lark Davis - skipping
+2025-03-08 17:40:28,946 - YouTubeTracker - INFO - Processing channel: EllioTrades (ID: UC4zU8VEU8OrcWmz1P0gvWdA)
+2025-03-08 17:40:29,027 - YouTubeTracker - WARNING - No channel found for ID: UC4zU8VEU8OrcWmz1P0gvWdA
+2025-03-08 17:40:29,027 - YouTubeTracker - WARNING - Could not get uploads playlist for channel EllioTrades - skipping
+2025-03-08 17:40:29,027 - YouTubeTracker - INFO - Processing channel: The Chart Guys (ID: UCx_rqR_fX3WSkMnAyaZC0Aw)
+2025-03-08 17:40:29,133 - YouTubeTracker - WARNING - No channel found for ID: UCx_rqR_fX3WSkMnAyaZC0Aw
+2025-03-08 17:40:29,133 - YouTubeTracker - WARNING - Could not get uploads playlist for channel The Chart Guys - skipping
+2025-03-08 17:40:29,133 - YouTubeTracker - INFO - Processing channel: Brian Jung (ID: UCrYT1Ov5r9Kl0Uy-HqsHHLg)
+2025-03-08 17:40:29,217 - YouTubeTracker - WARNING - No channel found for ID: UCrYT1Ov5r9Kl0Uy-HqsHHLg
+2025-03-08 17:40:29,218 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Brian Jung - skipping
+2025-03-08 17:40:29,218 - YouTubeTracker - INFO - Processing channel: Boxmining (ID: UCw-VjEDSn69kuI4VdYwmKLw)
+2025-03-08 17:40:29,285 - YouTubeTracker - WARNING - No channel found for ID: UCw-VjEDSn69kuI4VdYwmKLw
+2025-03-08 17:40:29,285 - YouTubeTracker - WARNING - Could not get uploads playlist for channel Boxmining - skipping
+2025-03-08 17:40:29,286 - YouTubeTracker - INFO - Processing channel: CryptoWendyO (ID: UCla2jS8BrfLJj7kbKyy5_ew)
+2025-03-08 17:40:29,358 - YouTubeTracker - INFO - Found uploads playlist UUla2jS8BrfLJj7kbKyy5_ew for channel UCla2jS8BrfLJj7kbKyy5_ew
+2025-03-08 17:40:29,891 - YouTubeTracker - INFO - Retrieved 10 recent videos from playlist UUla2jS8BrfLJj7kbKyy5_ew
+2025-03-08 17:40:29,891 - YouTubeTracker - INFO - Found 10 recent videos from CryptoWendyO
+2025-03-08 17:40:30,820 - YouTubeTracker - INFO - Successfully retrieved transcript for video HX6nty9FswI: 14566 characters
+2025-03-08 17:40:30,871 - SentimentAnalyzer - INFO - Sentiment analysis: 4.17
+2025-03-08 17:40:30,896 - YouTubeTracker - INFO - Successfully processed video HX6nty9FswI - Score: 4.17
+2025-03-08 17:40:30,897 - YouTubeTracker - INFO - Video WUESSbDJi6Y already processed - skipping
+2025-03-08 17:40:30,898 - YouTubeTracker - INFO - Video W_Z9Zn9DpYk already processed - skipping
+2025-03-08 17:40:30,898 - YouTubeTracker - INFO - Video 9NRi9SnRvlo already processed - skipping
+2025-03-08 17:40:30,899 - YouTubeTracker - INFO - Video aMEPDBBhGBk already processed - skipping
+2025-03-08 17:40:30,899 - YouTubeTracker - INFO - Video u-EeeBe-ZCY already processed - skipping
+2025-03-08 17:40:30,899 - YouTubeTracker - INFO - Video bexxPkmQJIc already processed - skipping
+2025-03-08 17:40:30,900 - YouTubeTracker - INFO - Video OUJtYKd9-sc already processed - skipping
+2025-03-08 17:40:30,900 - YouTubeTracker - INFO - Video AcHY9dnPaUA already processed - skipping
+2025-03-08 17:40:30,901 - YouTubeTracker - INFO - Video -eKCZ5C08Xs already processed - skipping
+2025-03-08 17:40:32,901 - YouTubeTracker - INFO - Tracker run complete. Processed 2 new videos
+2025-03-08 17:40:56,602 - YouTubeTracker - INFO - YouTube tracker scheduler stopped by user
