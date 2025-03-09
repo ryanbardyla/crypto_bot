@@ -1,0 +1,144 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  database:
+    image: postgres:14-alpine
+    container_name: crypto-db
+    environment:
+      POSTGRES_USER: crypto
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: crypto_sentiment
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  youtube-tracker:
+    build:
+      context: .
+      dockerfile: youtube_tracker.Dockerfile
+    container_name: crypto-youtube-tracker
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_URI: postgres://crypto:${DB_PASSWORD}@database:5432/crypto_sentiment
+      YOUTUBE_API_KEY: ${YOUTUBE_API_KEY}
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  sentiment-ml:
+    build:
+      context: .
+      dockerfile: sentiment_ml.Dockerfile
+    container_name: crypto-sentiment-ml
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_URI: postgres://crypto:${DB_PASSWORD}@database:5432/crypto_sentiment
+    volumes:
+      - ./ml_models:/app/ml_models
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  price-fetcher:
+    build:
+      context: .
+      dockerfile: price_fetcher.Dockerfile
+    container_name: crypto-price-fetcher
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_URI: postgres://crypto:${DB_PASSWORD}@database:5432/crypto_sentiment
+      COINGECKO_API_KEY: ${COINGECKO_API_KEY}
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  trading-bot:
+    build:
+      context: .
+      dockerfile: trading_bot.Dockerfile
+    container_name: crypto-trading-bot
+    depends_on:
+      database:
+        condition: service_healthy
+      sentiment-ml:
+        condition: service_started
+      price-fetcher:
+        condition: service_started
+    environment:
+      DB_URI: postgres://crypto:${DB_PASSWORD}@database:5432/crypto_sentiment
+      HYPERLIQUID_API_KEY: ${HYPERLIQUID_API_KEY}
+      HYPERLIQUID_API_SECRET: ${HYPERLIQUID_API_SECRET}
+      MODE: ${TRADING_MODE:-paper}
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard.Dockerfile
+    container_name: crypto-dashboard
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      DB_URI: postgres://crypto:${DB_PASSWORD}@database:5432/crypto_sentiment
+    ports:
+      - "8050:8050"
+    volumes:
+      - ./config:/app/config
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+
+  metrics:
+    image: prom/prometheus:v2.37.0
+    container_name: crypto-prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:9.2.0
+    container_name: crypto-grafana
+    depends_on:
+      - metrics
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-admin}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  prometheus_data:
+  grafana_data:
