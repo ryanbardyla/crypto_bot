@@ -1,195 +1,244 @@
-# multi_api_price_fetcher.py
-import requests
+# In multi_api_price_fetcher.py
+
+import os
 import time
 import json
+import random
+import threading
+import requests
+import logging
 import socket
 from datetime import datetime
 
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger(__name__)
+
+class RateLimiter:
+    """Rate limiter for API calls"""
+    def __init__(self, calls_per_second=1, burst_limit=None):
+        self.rate = calls_per_second
+        self.last_call = 0
+        self.lock = threading.Lock()
+        self.burst_limit = burst_limit
+        self.call_count = 0
+        self.reset_time = time.time() + 1.0  # Reset counter after 1 second
+        
+    def wait(self):
+        """Wait if necessary to maintain the rate limit"""
+        with self.lock:
+            # Check burst limit
+            if self.burst_limit:
+                current_time = time.time()
+                if current_time > self.reset_time:
+                    self.call_count = 0
+                    self.reset_time = current_time + 1.0
+                
+                self.call_count += 1
+                if self.call_count > self.burst_limit:
+                    sleep_time = self.reset_time - current_time
+                    time.sleep(max(0, sleep_time))
+                    self.call_count = 1
+                    self.reset_time = time.time() + 1.0
+            
+            # Regular rate limiting
+            elapsed = time.time() - self.last_call
+            if elapsed < (1.0 / self.rate):
+                sleep_time = (1.0 / self.rate) - elapsed
+                time.sleep(sleep_time)
+            
+            self.last_call = time.time()
+
 class CryptoPriceFetcher:
-    """Fetch cryptocurrency prices from multiple APIs with fallback"""
-    
     def __init__(self, save_data=True):
-        self.save_data = save_data
         self.data_file = "price_history.json"
         self.price_history = self._load_history()
+        self.save_data = save_data
+        self.rate_limiters = {
+            "coingecko": RateLimiter(calls_per_second=0.5, burst_limit=10),  # 10 calls per 20 seconds
+            "coinbase": RateLimiter(calls_per_second=3, burst_limit=30),     # 30 calls per 10 seconds
+            "kraken": RateLimiter(calls_per_second=1, burst_limit=15),       # 15 calls per 15 seconds
+            "binance": RateLimiter(calls_per_second=10, burst_limit=100)     # 100 calls per 10 seconds
+        }
         
-        # API configuration - multiple sources for redundancy
+        # API configuration
         self.apis = [
             {
                 "name": "CoinGecko",
                 "url": "https://api.coingecko.com/api/v3/simple/price?ids={id}&vs_currencies=usd",
-                "mapping": {  # Map common symbols to their CoinGecko IDs
-                    "BTC": "bitcoin",
-                    "ETH": "ethereum",
-                    "SOL": "solana",
-                    "DOGE": "dogecoin",
-                    "XRP": "ripple"
-                },
-                "extract": lambda data, id: data[id]["usd"]
+                "symbol_map": {"BTC": "bitcoin", "ETH": "ethereum", "SOL": "solana", "DOGE": "dogecoin"},
+                "extract": lambda data, id: float(data.get(id, {}).get("usd", 0)),
+                "rate_limiter": "coingecko"
             },
             {
                 "name": "Coinbase",
                 "url": "https://api.coinbase.com/v2/prices/{id}-USD/spot",
-                "mapping": {  # Map common symbols as they appear in Coinbase API
-                    "BTC": "BTC",
-                    "ETH": "ETH",
-                    "SOL": "SOL",
-                    "DOGE": "DOGE",
-                    "XRP": "XRP"
-                },
-                "extract": lambda data, id: float(data["data"]["amount"])
+                "symbol_map": {"BTC": "BTC", "ETH": "ETH", "SOL": "SOL", "DOGE": "DOGE"},
+                "extract": lambda data, id: float(data["data"]["amount"]),
+                "rate_limiter": "coinbase"
+            },
+            {
+                "name": "Kraken",
+                "url": "https://api.kraken.com/0/public/Ticker?pair={id}USD",
+                "symbol_map": {"BTC": "XBT", "ETH": "ETH", "SOL": "SOL", "DOGE": "DOGE"},
+                "extract": lambda data, id: float(data["result"][f"{id}USD"]["c"][0]),
+                "rate_limiter": "kraken"
+            },
+            {
+                "name": "Binance",
+                "url": "https://api.binance.com/api/v3/ticker/price?symbol={id}USDT",
+                "symbol_map": {"BTC": "BTC", "ETH": "ETH", "SOL": "SOL", "DOGE": "DOGE"},
+                "extract": lambda data, id: float(data["price"]),
+                "rate_limiter": "binance"
             }
         ]
         
-        # Mock prices for testing when all APIs fail
-        self.mock_prices = {
-            "BTC": 48500.25,
-            "ETH": 3250.75,
-            "SOL": 120.50,
-            "DOGE": 0.12,
-            "XRP": 0.57
-        }
-    
+        # Initial call to avoid calling too many APIs at once
+        random.shuffle(self.apis)
+        logger.info("CryptoPriceFetcher initialized")
+        
     def _load_history(self):
-        """Load existing price history if available"""
+        """Load price history from file"""
         try:
-            with open(self.data_file, 'r') as f:
-                return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError):
+            if os.path.exists(self.data_file):
+                with open(self.data_file, 'r') as f:
+                    return json.load(f)
+            return {}
+        except Exception as e:
+            logger.error(f"Error loading price history: {e}")
             return {}
     
     def _save_history(self):
         """Save price history to file"""
-        if self.save_data:
-            with open(self.data_file, 'w') as f:
-                json.dump(self.price_history, f, indent=2)
-    
+        try:
+            if self.save_data:
+                with open(self.data_file, 'w') as f:
+                    json.dump(self.price_history, f, indent=2)
+                logger.debug("Price history saved to file")
+        except Exception as e:
+            logger.error(f"Error saving price history: {e}")
+            
     def _store_price(self, symbol, price, source="unknown"):
-        """Store a price in history"""
+        """Store price in history"""
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         if symbol not in self.price_history:
             self.price_history[symbol] = []
-        
+            
         self.price_history[symbol].append({
             "timestamp": timestamp,
             "price": price,
             "source": source
         })
         
+        # Keep history manageable (last 10000 entries)
+        if len(self.price_history[symbol]) > 10000:
+            self.price_history[symbol] = self.price_history[symbol][-10000:]
+            
         self._save_history()
-    
+        
     def _is_dns_working(self, hostname):
-        """Check if DNS resolution works for a given hostname"""
+        """Check if DNS resolution is working"""
         try:
             socket.gethostbyname(hostname)
             return True
-        except socket.gaierror:
+        except:
             return False
-    
+            
     def _get_mock_price(self, symbol):
-        """Return mock price data for testing"""
-        if symbol in self.mock_prices:
-            price = self.mock_prices[symbol]
+        """Generate mock price based on historical data or defaults"""
+        try:
+            # Base prices
+            starting_prices = {
+                "BTC": 85000,
+                "ETH": 2200,
+                "SOL": 140,
+                "DOGE": 0.20
+            }
+            
+            # Get last price if available
+            last_price = None
+            if symbol in self.price_history and self.price_history[symbol]:
+                last_price = self.price_history[symbol][-1]["price"]
+            
+            # Generate new price
+            if last_price:
+                # Random change up to 1%
+                change = (random.random() * 2 - 1) * 0.01
+                price = last_price * (1 + change)
+            else:
+                price = starting_prices.get(symbol, 1000)
+                
             self._store_price(symbol, price, source="mock_data")
-            print(f"Using mock data for {symbol}: ${price}")
+            logger.info(f"Using mock data for {symbol}: ${price}")
             return price
-        else:
-            print(f"No mock data available for {symbol}")
-            return None
-    
+        except Exception as e:
+            logger.error(f"Error generating mock price: {e}")
+            price = starting_prices.get(symbol, 1000)
+            logger.warning(f"Using default mock data for {symbol}: ${price}")
+            return price
+            
     def get_price(self, symbol="BTC", use_mock=False):
-        """Get current price for a cryptocurrency from any available API"""
+        """Get current price for a cryptocurrency"""
         if use_mock:
             return self._get_mock_price(symbol)
+            
+        # First check if DNS is working
+        if not self._is_dns_working("api.coingecko.com"):
+            logger.warning("DNS resolution failed, using mock data")
+            return self._get_mock_price(symbol)
         
-        # Try each API in sequence until one works
+        # Try each API until we get a price
+        random.shuffle(self.apis)  # Randomize order to distribute load
+        
         for api in self.apis:
             try:
-                # Check if this API supports the requested symbol
-                if symbol not in api["mapping"]:
-                    print(f"{api['name']} API doesn't support {symbol}, skipping...")
+                crypto_id = api["symbol_map"].get(symbol)
+                if not crypto_id:
+                    logger.debug(f"{api['name']} API doesn't support {symbol}, skipping...")
                     continue
-                
-                # Extract domain from URL for DNS check
+                    
+                # Check if DNS resolution works for this API
                 api_domain = api["url"].split("//")[1].split("/")[0]
-                
-                # Check DNS resolution before making the request
                 if not self._is_dns_working(api_domain):
-                    print(f"DNS resolution failed for {api_domain}, skipping {api['name']} API...")
+                    logger.warning(f"DNS resolution failed for {api_domain}, skipping {api['name']} API...")
                     continue
                 
-                # Prepare the URL with the mapped ID
-                crypto_id = api["mapping"][symbol]
+                # Apply rate limiting
+                rate_limiter_key = api.get("rate_limiter", "default")
+                if rate_limiter_key in self.rate_limiters:
+                    self.rate_limiters[rate_limiter_key].wait()
+                    
                 url = api["url"].format(id=crypto_id)
+                logger.debug(f"Trying {api['name']} API...")
                 
-                # Make the request
-                print(f"Trying {api['name']} API...")
                 response = requests.get(url, timeout=10)
                 response.raise_for_status()
-                
-                # Extract the price using the API-specific extraction function
                 data = response.json()
+                
                 price = api["extract"](data, crypto_id)
                 
-                # Store successful result
+                # Add to history
                 self._store_price(symbol, price, source=api["name"])
-                print(f"Successfully fetched {symbol} price from {api['name']}")
-                return price
+                logger.info(f"Successfully fetched {symbol} price from {api['name']}: ${price:.2f}")
                 
+                return price
+            except KeyError as e:
+                logger.warning(f"Error with {api['name']} API: Unexpected response format - missing key {str(e)}")
             except requests.exceptions.RequestException as e:
-                print(f"Error with {api['name']} API: {str(e)}")
-            except (KeyError, ValueError, TypeError) as e:
-                print(f"Error parsing data from {api['name']} API: {str(e)}")
+                logger.warning(f"Request error with {api['name']} API: {str(e)}")
+            except (TypeError, ValueError) as e:
+                logger.warning(f"Error parsing data from {api['name']} API: {str(e)}")
             except Exception as e:
-                print(f"Unexpected error with {api['name']} API: {str(e)}")
-        
-        # If all APIs fail, fall back to mock data
-        print("All APIs failed, falling back to mock data.")
+                logger.warning(f"Unexpected error with {api['name']} API: {str(e)}")
+                
+        # If all APIs failed, use mock data
+        logger.warning("All APIs failed, falling back to mock data.")
         return self._get_mock_price(symbol)
     
-    def print_latest_prices(self):
-        """Print the latest price for each tracked symbol"""
-        if not self.price_history:
-            print("No price data available yet.")
-            return
-            
-        for symbol, history in self.price_history.items():
-            if history:
-                latest = history[-1]
-                print(f"{symbol}: ${latest['price']:.2f} at {latest['timestamp']} (Source: {latest.get('source', 'unknown')})")
-            else:
-                print(f"{symbol}: No price data available")
-    
     def get_price_history(self, symbol):
-        """Return the price history for a symbol"""
-        return self.price_history.get(symbol, [])
-
-
-# Simple demonstration
-if __name__ == "__main__":
-    print("Multi-API Cryptocurrency Price Fetcher")
-    print("--------------------------------------")
-    
-    # Allow user to decide if they want to use mock data
-    use_mock = False
-    response = input("Do you want to use mock data for testing? (y/n, default=n): ").lower()
-    if response in ['y', 'yes']:
-        use_mock = True
-        print("Using mock data for this session.")
-    
-    fetcher = CryptoPriceFetcher()
-    
-    # List of cryptocurrencies to fetch
-    cryptos = ["BTC", "ETH", "SOL", "DOGE"]
-    
-    print("\nFetching current prices...")
-    for crypto in cryptos:
-        price = fetcher.get_price(crypto, use_mock=use_mock)
-        if price is not None:
-            print(f"Current {crypto} price: ${price:.2f}")
-        else:
-            print(f"Could not retrieve {crypto} price from any source.")
-    
-    # Print summary of all prices
-    print("\nSummary of all prices:")
-    fetcher.print_latest_prices()
+        """Get historical price data for a symbol"""
+        if symbol in self.price_history:
+            return self.price_history[symbol]
+        return []

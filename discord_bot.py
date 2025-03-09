@@ -14,8 +14,24 @@ from youtube_transcript_api import YouTubeTranscriptApi
 from sentiment_analyzer import SentimentAnalyzer
 from simple_backtester import SimpleBacktester
 
-# Load environment variables from .env file
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Load environment variables
 load_dotenv()
+
+# Get logger for this module
+logger = get_module_logger(__name__)
+
+# Set up Discord bot
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix='!', intents=intents)
+
+# Initialize sentiment analyzer
+sentiment_analyzer = SentimentAnalyzer()
+
+# Define file paths
+sentiment_dir = "sentiment_data"
 
 # Set up logging
 logging.basicConfig(

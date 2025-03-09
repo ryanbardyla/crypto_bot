@@ -1,29 +1,30 @@
 import os
 import json
-import logging
+import time
 import tweepy
 import schedule
-import time
+import logging
 from datetime import datetime
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
+from dotenv import load_dotenv
+from sqlalchemy import create_engine, Column, String, Float, Integer, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+from sentiment_analyzer import SentimentAnalyzer
+
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
 
 # Load environment variables
 load_dotenv()
 
-logging.basicConfig(
-        handlers=[
-            logging.FileHandler("twitter_collector.log"),
-            logging.StreamHandler()
-        ]
-    )
-logger = logging.getLogger("TwitterCollector")
+# Get logger for this module
+logger = get_module_logger("TwitterCollector")
+
+# Define database model
 Base = declarative_base()
 
 class TwitterSentiment(Base):
-    __tablename__ = "sentiment_twitter"
+    __tablename__ = 'sentiment_twitter'
     
     id = Column(Integer, primary_key=True)
     tweet_id = Column(String, unique=True)
@@ -51,19 +52,19 @@ class TwitterCollector:
         self.setup_twitter_api()
         self.setup_database()
         self.sentiment_analyzer = SentimentAnalyzer()
-    
+        
     def load_config(self, config_file):
         try:
             with open(config_file, "r") as f:
                 self.config = json.load(f)
                 
-            # Load non-sensitive configuration
             self.search_terms = self.config.get("search_terms", [])
             self.crypto_symbols = self.config.get("crypto_symbols", ["BTC", "ETH"])
             self.accounts_to_follow = self.config.get("accounts_to_follow", [])
             self.check_interval_minutes = self.config.get("check_interval_minutes", 30)
             self.max_tweets_per_search = self.config.get("max_tweets_per_search", 100)
             self.db_path = self.config.get("db_path", "sqlite:///sentiment_database.db")
+            
             logger.info("Configuration loaded successfully")
         except Exception as e:
             logger.error(f"Failed to load configuration: {str(e)}")

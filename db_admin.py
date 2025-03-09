@@ -1,12 +1,18 @@
-# db_admin.py
-
 import os
 import json
 import argparse
 import pandas as pd
-from datetime import datetime, timedelta
 from tabulate import tabulate
-from database_manager import DatabaseManager
+from datetime import datetime, timedelta
+from sqlalchemy import create_engine, text
+from database_manager import DatabaseManager, SentimentRecord
+
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger(__name__)
+
 
 def list_records(db_manager, record_type=None, days=None, limit=10):
     """List sentiment records."""

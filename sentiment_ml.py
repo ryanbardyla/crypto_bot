@@ -15,15 +15,11 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sqlalchemy import create_engine, text
 
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("sentiment_ml.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("SentimentML")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("SentimentML")
 
 class SentimentML:
     def __init__(self, config_file="sentiment_ml_config.json"):
@@ -33,7 +29,7 @@ class SentimentML:
         self.cached_data = None
         self.last_data_fetch = None
         self.data_cache_ttl = 3600  # 1 hour cache TTL
-    
+        
     def load_config(self, config_file):
         """Load configuration from file"""
         try:
@@ -54,6 +50,7 @@ class SentimentML:
         except Exception as e:
             logger.error(f"Failed to load configuration: {str(e)}")
             raise
+
     
     def setup_database(self):
         """Set up database connection"""

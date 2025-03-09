@@ -1,282 +1,221 @@
-# crypto_analyzer.py
-import json
-import matplotlib.pyplot as plt
-from datetime import datetime
-import pandas as pd
-import numpy as np
+# crypto_analyzer.py (updated with concurrent processing)
+
 import os
-from multi_api_price_fetcher import CryptoPriceFetcher
+import json
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger(__name__)
 
 class CryptoAnalyzer:
-    """Analyze cryptocurrency price data and generate basic signals"""
-    
     def __init__(self, price_fetcher=None):
-        """Initialize with an existing price fetcher or create a new one"""
         if price_fetcher is None:
+            from multi_api_price_fetcher import CryptoPriceFetcher
             self.price_fetcher = CryptoPriceFetcher()
         else:
             self.price_fetcher = price_fetcher
-    
+        self.max_workers = 4  # Adjust based on your system capabilities
+            
     def fetch_latest_prices(self, symbols=None):
-        """Fetch latest prices for all specified symbols"""
+        """Fetch latest prices for multiple symbols concurrently"""
         if symbols is None:
             symbols = ["BTC", "ETH", "SOL", "DOGE"]
+            
+        prices = {}
         
-        results = {}
-        for symbol in symbols:
-            price = self.price_fetcher.get_price(symbol)
-            if price is not None:
-                results[symbol] = price
-        
-        return results
+        # Use ThreadPoolExecutor for concurrent API requests
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit tasks
+            future_to_symbol = {executor.submit(self.price_fetcher.get_price, symbol): symbol for symbol in symbols}
+            
+            # Process results as they complete
+            for future in as_completed(future_to_symbol):
+                symbol = future_to_symbol[future]
+                try:
+                    price = future.result()
+                    if price is not None:
+                        prices[symbol] = price
+                        logger.info(f"Fetched price for {symbol}: ${price:.2f}")
+                    else:
+                        logger.warning(f"Could not get price for {symbol}")
+                except Exception as e:
+                    logger.error(f"Error getting price for {symbol}: {e}")
+                    
+        return prices
     
     def convert_history_to_dataframe(self, symbol):
-        """Convert price history for a symbol to pandas DataFrame"""
-        history = self.price_fetcher.get_price_history(symbol)
-        
-        if not history:
-            print(f"No price history available for {symbol}")
+        """Convert price history to pandas DataFrame"""
+        try:
+            history = self.price_fetcher.get_price_history(symbol)
+            if not history or len(history) < 2:
+                logger.warning(f"No price history available for {symbol}")
+                return None
+                
+            df = pd.DataFrame(history)
+            df['timestamp'] = pd.to_datetime(df['timestamp'])
+            df = df.set_index('timestamp')
+            return df
+        except Exception as e:
+            logger.error(f"Error converting history to dataframe: {e}")
             return None
-        
-        # Convert history to DataFrame
-        df = pd.DataFrame(history)
-        
-        # Convert timestamp strings to datetime objects
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
-        
-        # Set timestamp as index
-        df = df.set_index('timestamp')
-        
-        return df
     
     def calculate_basic_indicators(self, symbol):
         """Calculate basic technical indicators for a symbol"""
         df = self.convert_history_to_dataframe(symbol)
-        
         if df is None or len(df) < 2:
-            print(f"Not enough data to calculate indicators for {symbol}")
+            logger.warning(f"Not enough data to calculate indicators for {symbol}")
             return None
             
-        # Make a copy to avoid SettingWithCopyWarning
         result = df.copy()
-        
-        # Calculate percentage change
         result['pct_change'] = result['price'].pct_change() * 100
         
-        # Calculate simple moving averages if we have enough data
+        # Calculate moving averages if enough data points
         if len(result) >= 3:
             result['sma_3'] = result['price'].rolling(window=3).mean()
-        
         if len(result) >= 5:
             result['sma_5'] = result['price'].rolling(window=5).mean()
-        
-        # Calculate volatility (standard deviation over recent periods)
-        if len(result) >= 5:
             result['volatility'] = result['price'].rolling(window=5).std()
-        
+        if len(result) >= 14:
+            result['sma_14'] = result['price'].rolling(window=14).mean()
+            
+        # Add Bollinger Bands if enough data
+        if len(result) >= 20:
+            result['sma_20'] = result['price'].rolling(window=20).mean()
+            result['upper_band'] = result['sma_20'] + (result['price'].rolling(window=20).std() * 2)
+            result['lower_band'] = result['sma_20'] - (result['price'].rolling(window=20).std() * 2)
+            
         return result
+    
+    def analyze_multiple_symbols(self, symbols=None):
+        """Analyze multiple symbols concurrently"""
+        if symbols is None:
+            symbols = ["BTC", "ETH", "SOL", "DOGE"]
+            
+        results = {}
+        
+        # Use ThreadPoolExecutor for concurrent analysis
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit tasks
+            future_to_symbol = {executor.submit(self.calculate_basic_indicators, symbol): symbol for symbol in symbols}
+            
+            # Process results as they complete
+            for future in as_completed(future_to_symbol):
+                symbol = future_to_symbol[future]
+                try:
+                    indicator_df = future.result()
+                    if indicator_df is not None:
+                        results[symbol] = indicator_df
+                        logger.info(f"Analyzed {symbol}: {len(indicator_df)} data points")
+                    else:
+                        logger.warning(f"Could not analyze {symbol}")
+                except Exception as e:
+                    logger.error(f"Error analyzing {symbol}: {e}")
+                    
+        return results
     
     def get_simple_signals(self, symbol):
         """Generate simple trading signals based on indicators"""
         df = self.calculate_basic_indicators(symbol)
-        
         if df is None or len(df) < 2:  # Need at least some data points
-            return {"status": "Not enough data for signals", "symbol": symbol}
-        
+            logger.warning(f"Not enough data for signal generation for {symbol}")
+            return {
+                "symbol": symbol,
+                "date": datetime.now().strftime("%Y-%m-%d"),
+                "signals": ["ERROR: Insufficient data"],
+                "status": "error"
+            }
+            
         signals = {
             "symbol": symbol,
-            "current_price": 0,
-            "signals": []
+            "date": df.index[-1].strftime("%Y-%m-%d"),
+            "price": df['price'].iloc[-1],
+            "signals": [],
+            "status": "neutral"  # Default status
         }
-        
+            
         try:
             latest = df.iloc[-1]
-            signals["current_price"] = latest['price']
             
-            # Make sure we have at least 2 data points
-            if len(df) >= 2:
-                prev = df.iloc[-2]
-            else:
-                prev = latest  # Use latest as fallback if only one point
-        
-                    # Check for price crossing above/below moving averages
-            if 'sma_5' in latest and 'sma_5' in prev:
-                if latest['price'] > latest['sma_5'] and prev['price'] <= prev['sma_5']:
-                    signals["signals"].append("BULLISH: Price crossed above 5-period SMA")
-                elif latest['price'] < latest['sma_5'] and prev['price'] >= prev['sma_5']:
-                    signals["signals"].append("BEARISH: Price crossed below 5-period SMA")
-            
-            # Check for significant price movements
-            if 'pct_change' in latest:
-                if latest['pct_change'] > 3:
-                    signals["signals"].append(f"ALERT: Large price increase ({latest['pct_change']:.2f}%)")
-                elif latest['pct_change'] < -3:
-                    signals["signals"].append(f"ALERT: Large price decrease ({latest['pct_change']:.2f}%)")
-            
-            # Add simple trend analysis
+            # Check for signals if we have enough data
             if len(df) >= 5:
+                # Moving average crossover
+                if 'sma_3' in df.columns and 'sma_5' in df.columns:
+                    if df['sma_3'].iloc[-2] <= df['sma_5'].iloc[-2] and df['sma_3'].iloc[-1] > df['sma_5'].iloc[-1]:
+                        signals["signals"].append("BULLISH: Price crossed above 5-period SMA")
+                        signals["status"] = "bullish"
+                    elif df['sma_3'].iloc[-2] >= df['sma_5'].iloc[-2] and df['sma_3'].iloc[-1] < df['sma_5'].iloc[-1]:
+                        signals["signals"].append("BEARISH: Price crossed below 5-period SMA")
+                        signals["status"] = "bearish"
+                
+                # Large price movements
+                if 'pct_change' in latest and abs(latest['pct_change']) > 5:
+                    if latest['pct_change'] > 0:
+                        signals["signals"].append(f"ALERT: Large price increase ({latest['pct_change']:.2f}%)")
+                    else:
+                        signals["signals"].append(f"ALERT: Large price decrease ({latest['pct_change']:.2f}%)")
+                        
+                # Check recent price direction
                 recent_prices = df['price'].tail(5)
-                if recent_prices.is_monotonic_increasing:
+                if all(recent_prices.diff().dropna() > 0):
                     signals["signals"].append("BULLISH: Price consistently increasing over last 5 periods")
-                elif recent_prices.is_monotonic_decreasing:
+                    signals["status"] = "bullish"
+                elif all(recent_prices.diff().dropna() < 0):
                     signals["signals"].append("BEARISH: Price consistently decreasing over last 5 periods")
-            
-            # If no specific signals, add a neutral message
+                    signals["status"] = "bearish"
+                    
+            # Add Bollinger Band signals if available
+            if 'upper_band' in df.columns and 'lower_band' in df.columns:
+                if df['price'].iloc[-1] > df['upper_band'].iloc[-1]:
+                    signals["signals"].append("BEARISH: Price above upper Bollinger Band (overbought)")
+                    signals["status"] = "bearish"
+                elif df['price'].iloc[-1] < df['lower_band'].iloc[-1]:
+                    signals["signals"].append("BULLISH: Price below lower Bollinger Band (oversold)")
+                    signals["status"] = "bullish"
+                
+            # If no specific signals were found
             if not signals["signals"]:
                 signals["signals"].append("NEUTRAL: No clear signals detected")
-        
+                
         except Exception as e:
-            print(f"Error generating signals for {symbol}: {e}")
+            logger.error(f"Error generating signals for {symbol}: {e}")
             signals["signals"].append(f"ERROR: {str(e)}")
+            signals["status"] = "error"
             
         return signals
     
-    def plot_price_history(self, symbol, save_to_file=None):
-        """Plot price history with indicators"""
-        df = self.calculate_basic_indicators(symbol)
-        
-        if df is None or len(df) < 2:
-            print(f"Not enough data to plot for {symbol}")
-            return
-        
-        plt.figure(figsize=(12, 6))
-        
-        # Plot price
-        plt.plot(df.index, df['price'], label='Price', color='blue', linewidth=2)
-        
-        # Plot moving averages if available
-        if 'sma_3' in df.columns:
-            plt.plot(df.index, df['sma_3'], label='3-period SMA', color='red', linestyle='--')
-        
-        if 'sma_5' in df.columns:
-            plt.plot(df.index, df['sma_5'], label='5-period SMA', color='green', linestyle='--')
-        
-        # Add labels and title
-        plt.xlabel('Date')
-        plt.ylabel('Price (USD)')
-        plt.title(f'{symbol} Price History')
-        plt.legend()
-        plt.grid(True, alpha=0.3)
-        
-        # Rotate date labels for better readability
-        plt.xticks(rotation=45)
-        
-        # Adjust layout
-        plt.tight_layout()
-        
-        # Save to file if requested
-        if save_to_file:
-            plt.savefig(save_to_file)
-            print(f"Chart saved to {save_to_file}")
-        else:
-            plt.show()
-    
-    def generate_summary_report(self, symbols=None):
-        """Generate a summary report for multiple cryptocurrencies"""
+    def get_signals_for_multiple_symbols(self, symbols=None):
+        """Generate signals for multiple symbols concurrently"""
         if symbols is None:
             symbols = ["BTC", "ETH", "SOL", "DOGE"]
-        
-        report = {
-            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            "symbols_analyzed": symbols,
-            "price_data": {},
-            "signals": {}
-        }
-        
-        for symbol in symbols:
-            # Get latest price - reuse existing prices when possible to avoid rate limits
-            try:
-                # First check if we already have this price in memory
-                df = self.convert_history_to_dataframe(symbol)
-                if df is not None and not df.empty:
-                    price = df['price'].iloc[-1]
-                    print(f"Using cached price for {symbol}: ${price:.2f}")
-                else:
-                    # If not, fetch a new price
-                    price = self.price_fetcher.get_price(symbol)
-                
-                if price is not None:
-                    report["price_data"][symbol] = price
-            except Exception as e:
-                print(f"Error getting price for {symbol}: {e}")
             
-            # Get signals
-            try:
-                signals = self.get_simple_signals(symbol)
-                if signals:
-                    # Handle both formats of signal responses
-                    if "signals" in signals:
-                        report["signals"][symbol] = signals["signals"]
-                    elif "status" in signals:
-                        report["signals"][symbol] = [signals["status"]]
-            except Exception as e:
-                print(f"Error generating signals for {symbol}: {e}")
-                report["signals"][symbol] = [f"Error: {str(e)}"]
+        results = {}
         
-        return report
-
-
-# Simple demonstration
-if __name__ == "__main__":
-    print("Cryptocurrency Price Analyzer")
-    print("-----------------------------")
-    
-    # Create price fetcher and analyzer
-    fetcher = CryptoPriceFetcher()
-    analyzer = CryptoAnalyzer(fetcher)
-    
-    # List of cryptocurrencies to analyze
-    cryptos = ["BTC", "ETH", "SOL", "DOGE"]
-    
-    # Fetch current prices first to ensure we have some data
-    print("\nFetching current prices...")
-    latest_prices = analyzer.fetch_latest_prices(cryptos)
-    
-            # Generate and print signals
-    print("\nGenerating trading signals...")
-    for symbol in cryptos:
-        if symbol in latest_prices:
-            try:
-                signals = analyzer.get_simple_signals(symbol)
-                print(f"\n{symbol} Analysis:")
-                print(f"Current Price: ${latest_prices[symbol]:.2f}")
-                
-                if "signals" in signals:
-                    print("Signals:")
-                    for signal in signals["signals"]:
-                        print(f"  - {signal}")
-                elif "status" in signals:
-                    print(f"Status: {signals['status']}")
-            except Exception as e:
-                print(f"\n{symbol} Analysis Error: {e}")
-    
-    # Ask if user wants to see charts
-    create_charts = input("\nDo you want to generate price charts? (y/n): ").lower()
-    if create_charts in ['y', 'yes']:
-        # Create charts directory if it doesn't exist
-        os.makedirs("charts", exist_ok=True)
-        
-        for symbol in cryptos:
-            if symbol in latest_prices:
-                print(f"Generating chart for {symbol}...")
-                analyzer.plot_price_history(symbol, save_to_file=f"charts/{symbol}_price_chart.png")
-    
-            # Generate summary report
-    print("\nGenerating summary report...")
-    try:
-        report = analyzer.generate_summary_report(cryptos)
-    except Exception as e:
-        print(f"Error generating report: {e}")
-        report = {
-            "error": str(e),
-            "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        }
-    
-    # Save report to file
-    with open("crypto_analysis_report.json", "w") as f:
-        json.dump(report, f, indent=2)
-    
-    print("Analysis complete! Report saved to crypto_analysis_report.json")
-    
-    if create_charts in ['y', 'yes']:
-        print("Charts saved to the 'charts' directory")
+        # Use ThreadPoolExecutor for concurrent signal generation
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit tasks
+            future_to_symbol = {executor.submit(self.get_simple_signals, symbol): symbol for symbol in symbols}
+            
+            # Process results as they complete
+            for future in as_completed(future_to_symbol):
+                symbol = future_to_symbol[future]
+                try:
+                    signals = future.result()
+                    results[symbol] = signals
+                    logger.info(f"Generated signals for {symbol}: {signals['status']}")
+                except Exception as e:
+                    logger.error(f"Error generating signals for {symbol}: {e}")
+                    results[symbol] = {
+                        "symbol": symbol,
+                        "date": datetime.now().strftime("%Y-%m-%d"),
+                        "signals": [f"Error: {str(e)}"],
+                        "status": "error"
+                    }
+                    
+        return results

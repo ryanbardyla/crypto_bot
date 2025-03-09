@@ -1,22 +1,18 @@
-# deploy_bot.py
 import os
 import sys
+import yaml
 import json
+import socket
 import argparse
 import subprocess
 import logging
 from datetime import datetime
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("deployment.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("DeployBot")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("DeployBot")
 
 class BotDeployer:
     def __init__(self, config_file="deployment_config.json"):
@@ -27,26 +23,19 @@ class BotDeployer:
             with open(config_file, "r") as f:
                 self.config = json.load(f)
                 
-            # Deployment settings
             self.environment = self.config.get("environment", "development")
             self.deploy_mode = self.config.get("deploy_mode", "docker")
             self.docker_image = self.config.get("docker_image", "crypto-sentiment-bot")
             self.docker_tag = self.config.get("docker_tag", "latest")
-            
-            # Cloud settings
             self.cloud_provider = self.config.get("cloud_provider", "aws")
             self.aws_region = self.config.get("aws_region", "us-east-1")
             self.aws_instance_type = self.config.get("aws_instance_type", "t2.micro")
-            
-            # Bot components to deploy
             self.deploy_youtube_tracker = self.config.get("deploy_youtube_tracker", True)
             self.deploy_twitter_collector = self.config.get("deploy_twitter_collector", True)
             self.deploy_sentiment_ml = self.config.get("deploy_sentiment_ml", True)
             self.deploy_alert_system = self.config.get("deploy_alert_system", True)
             self.deploy_paper_trader = self.config.get("deploy_paper_trader", True)
             self.deploy_dashboard = self.config.get("deploy_dashboard", True)
-            
-            # Monitoring settings
             self.enable_monitoring = self.config.get("enable_monitoring", True)
             self.alert_email = self.config.get("alert_email", "")
             
@@ -602,20 +591,12 @@ WantedBy=multi-user.target
             return False
 
 if __name__ == "__main__":
-    # Import yaml for docker-compose generation
-    import yaml
-    
     parser = argparse.ArgumentParser(description="Deploy Crypto Sentiment Bot")
     parser.add_argument("--config", type=str, default="deployment_config.json", help="Deployment configuration file")
     parser.add_argument("--environment", type=str, choices=["development", "production"], help="Deployment environment")
-    
     args = parser.parse_args()
     
     deployer = BotDeployer(args.config)
-    
-    if args.environment:
-        deployer.environment = args.environment
-        
     if deployer.deploy():
         logger.info("Deployment completed successfully")
         sys.exit(0)

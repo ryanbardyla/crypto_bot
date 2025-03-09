@@ -1,22 +1,17 @@
-# performance_tracker.py
 import os
 import json
-import logging
-import numpy as np
+import time
+import schedule
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 from datetime import datetime, timedelta
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("performance_tracker.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("PerformanceTracker")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("PerformanceTracker")
 
 class PerformanceTracker:
     def __init__(self, config_file="performance_tracker_config.json"):
@@ -28,19 +23,14 @@ class PerformanceTracker:
             with open(config_file, "r") as f:
                 self.config = json.load(f)
                 
-            # Performance settings
             self.performance_log_file = self.config.get("performance_log_file", "performance_history.json")
             self.trade_log_file = self.config.get("trade_log_file", "paper_trading/trade_history.json")
             self.report_interval_days = self.config.get("report_interval_days", 7)
             self.benchmark_symbol = self.config.get("benchmark_symbol", "BTC")
-            
-            # Metrics to calculate
             self.calculate_sharpe = self.config.get("calculate_sharpe", True)
             self.calculate_sortino = self.config.get("calculate_sortino", True)
             self.calculate_drawdown = self.config.get("calculate_drawdown", True)
             self.calculate_win_rate = self.config.get("calculate_win_rate", True)
-            
-            # Report output settings
             self.output_dir = self.config.get("output_dir", "performance_reports")
             self.generate_charts = self.config.get("generate_charts", True)
             

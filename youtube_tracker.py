@@ -1,34 +1,52 @@
 import os
 import json
+import time
 import logging
 import schedule
-import time
-import googleapiclient.discovery
+import threading
 from datetime import datetime, timedelta
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import googleapiclient.discovery
+from youtube_transcript_api import YouTubeTranscriptApi
 from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from youtube_transcript_api import YouTubeTranscriptApi
 from dotenv import load_dotenv
 from crypto_sentiment_analyzer import CryptoSentimentAnalyzer
+
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
 
 # Load environment variables
 load_dotenv()
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("youtube_tracker.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("YouTubeTracker")
+# Get logger for this module
+logger = get_module_logger("YouTubeTracker")
+
+# Define rate limiter class
+class RateLimiter:
+    """Rate limiter to prevent hitting API rate limits"""
+    def __init__(self, calls_per_second=1):
+        self.rate = calls_per_second
+        self.last_call = 0
+        self.lock = threading.Lock()
+        logger.debug(f"Initialized RateLimiter with {calls_per_second} calls per second")
+        
+    def wait(self):
+        """Wait if needed to respect the rate limit"""
+        with self.lock:
+            elapsed = time.time() - self.last_call
+            if elapsed < (1.0 / self.rate):
+                wait_time = (1.0 / self.rate) - elapsed
+                logger.debug(f"Rate limiting: waiting {wait_time:.2f}s")
+                time.sleep(wait_time)
+            self.last_call = time.time()
+
+# Define database model
 Base = declarative_base()
 
 class SentimentRecord(Base):
-    __tablename__ = "sentiment_youtube"
+    __tablename__ = 'sentiment_youtube'
     
     id = Column(Integer, primary_key=True)
     video_id = Column(String, unique=True)
@@ -54,16 +72,22 @@ class YouTubeTracker:
         self.setup_youtube_api()
         self.setup_database()
         self.sentiment_analyzer = CryptoSentimentAnalyzer()
-    
+        self.rate_limiter = RateLimiter(calls_per_second=0.5)  # YouTube API has quotas
+        self.executor = ThreadPoolExecutor(max_workers=10)  # Adjust based on your needs
+        
     def load_config(self, config_file):
         try:
             with open(config_file, "r") as f:
                 self.config = json.load(f)
+                
             self.channel_ids = self.config.get("channel_ids", [])
             self.channel_names = self.config.get("channel_names", {})
             self.check_interval_hours = self.config.get("check_interval_hours", 6)
             self.video_age_limit_days = self.config.get("video_age_limit_days", 7)
             self.db_path = self.config.get("db_path", "sqlite:///sentiment_database.db")
+            self.max_concurrent_channels = self.config.get("max_concurrent_channels", 5)
+            self.max_concurrent_videos = self.config.get("max_concurrent_videos", 10)
+            
             logger.info(f"Tracking {len(self.channel_ids)} YouTube channels")
             logger.info(f"Configuration loaded: check interval {self.check_interval_hours}h, video age limit {self.video_age_limit_days} days")
         except Exception as e:

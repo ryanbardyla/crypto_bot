@@ -1,82 +1,51 @@
-# live_trader.py
-import time
-import json
-import pandas as pd
-import numpy as np
 import os
-import schedule
+import json
+import time
 import threading
+import schedule
 from datetime import datetime
-import logging
 
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("HyperliquidTrader")
+
+# Import other necessary modules
 from multi_api_price_fetcher import CryptoPriceFetcher
 from crypto_analyzer import CryptoAnalyzer
 from advanced_strategy import AdvancedStrategy
 from hyperliquid_api import HyperliquidAPI
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("trading_bot.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("HyperliquidTrader")
-
 class HyperliquidTrader:
-    """
-    Live trading bot for Hyperliquid exchange
-    """
-    
     def __init__(self, config_file="config.json"):
-        """Initialize with configuration from file"""
         self.config = self._load_config(config_file)
-        
-        # Initialize components
         self.price_fetcher = CryptoPriceFetcher()
         self.analyzer = CryptoAnalyzer(self.price_fetcher)
         self.strategy = AdvancedStrategy(risk_level=self.config.get('risk_level', 'medium'))
-        
-        # Initialize API connection
         api_key = self.config.get('api_key', None)
         api_secret = self.config.get('api_secret', None)
         testnet = self.config.get('use_testnet', True)
-        
         self.api = HyperliquidAPI(api_key=api_key, api_secret=api_secret, testnet=testnet)
-        
-        # Trading settings
         self.symbols = self.config.get('symbols', ["BTC", "ETH", "SOL"])
         self.update_interval = self.config.get('update_interval_minutes', 5)
-        self.active = False
         self.max_positions = self.config.get('max_positions', 3)
-        
-        # State variables
-        self.positions = {}  # Current positions
-        self.pending_orders = {}  # Orders that are not yet filled
-        
-        # Create data directory if it doesn't exist
-        self.data_dir = "live_trading_data"
+        self.positions = {}
+        self.pending_orders = {}
+        self.data_dir = "data"
+        self.running = False
+        self.scheduler_thread = None
         os.makedirs(self.data_dir, exist_ok=True)
-        
         logger.info(f"Initialized Hyperliquid Trader with {len(self.symbols)} markets")
-    
+        
     def _load_config(self, config_file):
-        """Load configuration from JSON file"""
         try:
             with open(config_file, 'r') as f:
                 return json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
+        except Exception as e:
             logger.error(f"Error loading config: {e}")
-            # Return default config
-            return {
-                "risk_level": "low",
-                "symbols": ["BTC", "ETH", "SOL"],
-                "update_interval_minutes": 5,
-                "max_positions": 3,
-                "use_testnet": True
-            }
+            return {}
+
     
     def _save_state(self):
         """Save current trading state to file"""

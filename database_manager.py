@@ -1,24 +1,16 @@
-# database_manager.py
-
 import os
 import json
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, Text, Boolean, Index
+from sqlalchemy import create_engine, Column, String, Integer, Float, DateTime, Text, func, cast, Date, Index
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
-from sqlalchemy.pool import QueuePool
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("database_manager.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("DatabaseManager")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger(__name__)
 
 Base = declarative_base()
 
@@ -38,8 +30,6 @@ class SentimentRecord(Base):
     retweet_count = Column(Integer)
     like_count = Column(Integer)
     view_count = Column(Integer)
-    
-    # Sentiment metrics
     vader_neg = Column(Float)
     vader_neu = Column(Float)
     vader_pos = Column(Float)
@@ -49,14 +39,9 @@ class SentimentRecord(Base):
     keyword_sentiment = Column(Float)
     combined_score = Column(Float, index=True)
     text_length = Column(Integer)
-    
-    # Symbol relation
     symbol = Column(String(10), index=True)
-    
-    # Source information
     source = Column(String(200))
     
-    # Define indexes
     __table_args__ = (
         Index('idx_sentiment_date_score', processed_date, combined_score),
         Index('idx_sentiment_source_date', source, processed_date),
@@ -70,27 +55,19 @@ class DatabaseManager:
         self.setup_database()
         
     def setup_database(self):
-        """Initialize database connection with connection pooling."""
         try:
             if self.enable_pooling:
-                # Configure connection pooling
                 self.engine = create_engine(
                     self.db_path,
-                    poolclass=QueuePool,
-                    pool_size=10,
-                    max_overflow=20,
-                    pool_timeout=30,
-                    pool_recycle=1800  # Recycle connections every 30 minutes
+                    pool_recycle=3600,
+                    pool_pre_ping=True,
+                    echo=False
                 )
             else:
                 self.engine = create_engine(self.db_path)
                 
-            # Create tables if they don't exist
             Base.metadata.create_all(self.engine)
-            
-            # Create a scoped session factory
             self.session_factory = scoped_session(sessionmaker(bind=self.engine))
-            
             logger.info("Database connection established successfully")
         except Exception as e:
             logger.error(f"Failed to set up database: {str(e)}")
@@ -355,22 +332,19 @@ class DatabaseManager:
         finally:
             session.close()
 
-# If run directly, perform a database check
 if __name__ == "__main__":
     print("Database Manager - Performing initial setup and checks")
     db_manager = DatabaseManager()
-    
-    # Check connection
     session = db_manager.get_session()
+    
     try:
         result = session.execute("SELECT 1").scalar()
         print(f"Database connection test: {'Success' if result == 1 else 'Failed'}")
     except Exception as e:
         print(f"Database connection error: {str(e)}")
-    finally:
-        session.close()
+        
+    session.close()
     
-    # Check if migration is needed
     if os.path.exists("sentiment_data"):
         file_count = len([f for f in os.listdir("sentiment_data") if f.endswith('.json')])
         if file_count > 0:
@@ -378,5 +352,5 @@ if __name__ == "__main__":
             if migrate:
                 success, failed = db_manager.migrate_json_to_db()
                 print(f"Migration completed: {success} successes, {failed} failures")
-    
+                
     print("Database Manager setup complete")

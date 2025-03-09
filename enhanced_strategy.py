@@ -1,29 +1,19 @@
-# enhanced_strategy.py (updated version)
-
 import os
-import json
+import sys
 import math
+import json
 import logging
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker
-
-# Import our database manager
 from database_manager import DatabaseManager
 from multi_api_price_fetcher import CryptoPriceFetcher
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("enhanced_strategy.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("EnhancedStrategy")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("EnhancedStrategy")
 
 class EnhancedStrategy:
     def __init__(self, config_file="enhanced_strategy_config.json"):
@@ -35,7 +25,6 @@ class EnhancedStrategy:
             with open(config_file, "r") as f:
                 self.config = json.load(f)
                 
-            # Load channel weights and other configuration parameters
             self.channel_weights = self.config.get("channel_weights", {})
             self.default_weight = self.config.get("default_weight", 1.0)
             self.volatility_threshold = self.config.get("volatility_threshold", 2.0)
@@ -47,9 +36,9 @@ class EnhancedStrategy:
             self.take_profit_range = self.config.get("take_profit_range", [5.0, 15.0])
             self.db_path = self.config.get("db_path", "sqlite:///sentiment_database.db")
             
-            logger.info("Configuration loaded successfully")
+            logger.info("Strategy configuration loaded")
         except Exception as e:
-            logger.error(f"Failed to load configuration: {str(e)}")
+            logger.error(f"Error loading configuration: {str(e)}")
             raise
 
     def get_market_condition(self, price_data, lookback_days=14):

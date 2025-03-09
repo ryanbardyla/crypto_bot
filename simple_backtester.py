@@ -9,6 +9,10 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 
+# Import the necessary classes
+from multi_api_price_fetcher import CryptoPriceFetcher
+from crypto_analyzer import CryptoAnalyzer
+
 class SimpleBacktester:
     def __init__(self, initial_capital=10000, chunk_size=1000, memory_threshold=80):
         self.initial_capital = initial_capital

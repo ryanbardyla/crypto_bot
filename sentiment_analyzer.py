@@ -1,51 +1,49 @@
-# sentiment_analyzer.py (updated version)
-
 import re
-import logging
 import nltk
+import logging
+import sys
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("SentimentAnalyzer")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger(__name__)
+
+# Download VADER lexicon if not already present
+try:
+    nltk.data.find('vader_lexicon')
+except LookupError:
+    nltk.download('vader_lexicon')
 
 class SentimentAnalyzer:
     def __init__(self):
-        # Initialize VADER sentiment analyzer
-        try:
-            nltk.data.find('vader_lexicon')
-        except LookupError:
-            nltk.download('vader_lexicon')
-            
         self.sia = SentimentIntensityAnalyzer()
+        self.youtube_regex = r'(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
         
-        # Define keywords for crypto sentiment analysis
+        # Lists of keywords for sentiment analysis
         self.bullish_keywords = [
-            "bullish", "buy", "buying", "long", "upward", "uptrend", "rising", 
-            "rally", "strong", "growth", "growing", "increase", "increasing", 
-            "higher", "breakout", "support", "accumulate", "bottom", "bullrun",
-            "gains", "profit", "successful", "opportunity", "potential", "bargain",
-            "undervalued", "correction", "buy the dip", "hodl", "moon", "outperform"
+            "bullish", "buy", "long", "uptrend", "growth", "positive", "rally", "surge",
+            "climb", "breakout", "support", "oversold", "accumulate", "hodl", "moon",
+            "progress", "gain", "potential", "opportunity", "undervalued"
         ]
         
         self.bearish_keywords = [
-            "bearish", "sell", "selling", "short", "downward", "downtrend", "falling", 
-            "decline", "weak", "decrease", "decreasing", "lower", "breakdown", "resistance", 
-            "dump", "top", "bear market", "crash", "collapsed", "bubble", "overvalued", 
-            "risky", "risk", "danger", "dangerous", "correction", "concern", "worried",
-            "warning", "fail", "failed", "scam", "manipulation", "manipulated"
+            "bearish", "sell", "short", "downtrend", "decline", "negative", "crash", "drop",
+            "fall", "breakdown", "resistance", "overbought", "distribute", "dump", "tank",
+            "risk", "loss", "danger", "concern", "overvalued"
         ]
         
-        # YouTube URL regex patterns
-        self.youtube_regex = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})'
-
+        logger.info("SentimentAnalyzer initialized")
+        
     def _extract_youtube_id(self, url):
-        """Extract YouTube video ID from URL."""
+        """Extract the YouTube video ID from a URL"""
         match = re.search(self.youtube_regex, url)
         if match:
             return match.group(1)
         return None
+
 
     def get_youtube_transcript(self, url):
         """Get transcript from YouTube video."""

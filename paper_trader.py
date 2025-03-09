@@ -1,48 +1,48 @@
-# paper_trader.py
-import json
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-import time
 import os
+import json
+import time
 import schedule
+import pandas as pd
+import matplotlib.pyplot as plt
 import threading
+from datetime import datetime, timedelta
+
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("PaperTrader")
+
+# Import other necessary modules
 from multi_api_price_fetcher import CryptoPriceFetcher
 from crypto_analyzer import CryptoAnalyzer
 
 class PaperTrader:
-    """
-    Paper trading system that simulates cryptocurrency trades without using real money.
-    Uses real-time price data and trading signals to make decisions.
-    """
-    
     def __init__(self, initial_capital=10000):
-        """Initialize with starting capital"""
         self.initial_capital = initial_capital
         self.balance = initial_capital
-        self.positions = {}  # symbol -> {'quantity': qty, 'entry_price': price}
+        self.positions = {}
         self.trade_history = []
         self.performance_log = []
+        self.position_size_pct = 0.95
+        self.stop_loss_pct = 5.0
+        self.take_profit_pct = 10.0
+        self.max_positions = 3
+        self.save_interval = 30  # minutes
         
-        # Create our core components
         self.price_fetcher = CryptoPriceFetcher()
         self.analyzer = CryptoAnalyzer(self.price_fetcher)
         
-        # Trading parameters (can be adjusted)
-        self.position_size_pct = 0.95  # Use 95% of available balance for each position
-        self.stop_loss_pct = 5.0       # 5% stop loss
-        self.take_profit_pct = 10.0    # 10% take profit
-        self.max_positions = 3         # Maximum number of simultaneous positions
-        
-        # Auto-save settings
-        self.auto_save = True
-        self.save_interval = 10  # minutes
         self.data_dir = "paper_trading"
         os.makedirs(self.data_dir, exist_ok=True)
         
-        # Log initial state
+        # Create default state file if it doesn't exist
+        self.current_state_file = os.path.join(self.data_dir, "current_state.json")
+        if not os.path.exists(self.current_state_file):
+            self.save_state()
+            
         self._log_performance()
+        logger.info(f"Initialized paper trader with ${initial_capital:.2f} starting capital")
     
     def _log_performance(self):
         """Record current performance metrics"""

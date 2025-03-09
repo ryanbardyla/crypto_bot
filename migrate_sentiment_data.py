@@ -1,96 +1,66 @@
-# migrate_sentiment_data.py
-
 import os
 import json
-import logging
 import argparse
+import shutil
 from tqdm import tqdm
 from database_manager import DatabaseManager
 
-# Set up logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("migration.log"),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger("DataMigration")
+# Import the centralized logging configuration
+from utils.logging_config import get_module_logger
+
+# Get logger for this module
+logger = get_module_logger("DataMigration")
 
 def migrate_sentiment_data(json_dir="sentiment_data", db_path="sqlite:///sentiment_database.db", batch_size=100):
-    """
-    Migrate sentiment data from JSON files to SQLite database.
-    
-    Args:
-        json_dir (str): Directory containing JSON files
-        db_path (str): SQLite database path
-        batch_size (int): Number of records to process in a batch
-    
-    Returns:
-        tuple: (success_count, failed_count)
-    """
+    """Migrate sentiment data from JSON files to database"""
     db_manager = DatabaseManager(db_path)
     
-    # Check if directory exists
     if not os.path.exists(json_dir):
         logger.error(f"Directory {json_dir} does not exist")
         return 0, 0
-    
-    # Get list of JSON files
+        
     json_files = [f for f in os.listdir(json_dir) if f.endswith('.json')]
     total_files = len(json_files)
     
     if total_files == 0:
         logger.info("No JSON files found for migration")
         return 0, 0
-    
+        
     logger.info(f"Found {total_files} JSON files to migrate")
     
     success_count = 0
     failed_count = 0
     
-    # Use tqdm for progress bar
     for file_name in tqdm(json_files, desc="Migrating files"):
         file_path = os.path.join(json_dir, file_name)
-        
         try:
-            # Load JSON data
             with open(file_path, 'r') as f:
                 data = json.load(f)
-            
-            # Determine record type and ID
+                
             record_id = file_name.replace('.json', '')
             
-            # Figure out if it's a YouTube or Twitter record
+            # Determine record type based on source or ID
             if 'video_id' in data or record_id.startswith('youtube-'):
                 record_type = 'youtube'
-                if 'video_id' in data:
-                    record_id = data['video_id']
-                elif record_id.startswith('youtube-'):
+                if record_id.startswith('youtube-'):
                     record_id = record_id.replace('youtube-', '')
             else:
                 record_type = 'twitter'
-                if 'tweet_id' in data:
-                    record_id = data['tweet_id']
-            
-            # Save to database
+                
             if db_manager.save_sentiment_data(data, record_type, record_id):
                 success_count += 1
             else:
                 failed_count += 1
                 
+            # Progress update for large migrations
+            if (success_count + failed_count) % batch_size == 0:
+                logger.info(f"Progress: {success_count} successful, {failed_count} failed out of {total_files}")
+                
         except Exception as e:
             logger.error(f"Error migrating {file_name}: {str(e)}")
             failed_count += 1
-        
-        # Commit in batches to improve performance
-        if (success_count + failed_count) % batch_size == 0:
-            logger.info(f"Progress: {success_count} successful, {failed_count} failed out of {total_files}")
-    
-    # Final report
+            
     logger.info(f"Migration completed: {success_count} successful, {failed_count} failed out of {total_files}")
-    
     return success_count, failed_count
 
 def verify_migration(json_dir="sentiment_data", db_path="sqlite:///sentiment_database.db"):
