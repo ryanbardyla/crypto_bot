@@ -1,0 +1,19 @@
+{
+  "vader_sentiment": {
+    "neg": 0.038,
+    "neu": 0.795,
+    "pos": 0.166,
+    "compound": 0.7906
+  },
+  "bullish_keywords": 3,
+  "bearish_keywords": 0,
+  "keyword_sentiment": 10.0,
+  "combined_score": 9.1624,
+  "mentioned_cryptos": [],
+  "price_predictions": [],
+  "text_length": 363,
+  "source": "youtube-dl75gnwt_nc",
+  "timestamp": "2025-03-09 19:50:56",
+  "video_id": "dl75gnwt_nc",
+  "title": "Crypto Community Unite: Join Our Discord Server Now \ud83d\udd25"
+}

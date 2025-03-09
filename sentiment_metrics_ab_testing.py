@@ -1,414 +1,307 @@
-# sentiment_metrics_ab_testing.py
-
 import os
 import json
-import pandas as pd
-import numpy as np
-from typing import Dict, List, Optional, Any, Callable
+from typing import Dict, List, Callable, Optional
 from datetime import datetime, timedelta
-from collections import defaultdict
+
+import numpy as np
+import pandas as pd
+
 from ab_testing_framework import ABTestingFramework
+from enhanced_performance_metrics import EnhancedPerformanceMetrics
 
 class SentimentAnalysisABTesting:
     """
-    A/B testing framework specifically for evaluating sentiment analysis approaches
+    A class for conducting A/B testing on sentiment analysis techniques.
+    
+    This class provides methods to register, evaluate, and compare different 
+    sentiment analysis approaches using various performance metrics.
     """
+
     def __init__(self, data_dir: str = "sentiment_ab_testing_data"):
         """
-        Initialize the sentiment analysis A/B testing framework
+        Initialize the A/B testing framework for sentiment analysis.
         
         Args:
-            data_dir: Directory to store test data
+            data_dir (str, optional): Directory to store A/B testing data. 
+                                      Defaults to "sentiment_ab_testing_data".
         """
         self.ab_framework = ABTestingFramework(data_dir=data_dir)
-        
-        # Dictionary to store sentiment analyzer implementations
-        self.analyzers = {}
-        
+        self.registered_analyzers = {}
+
     def register_analyzer(self, analyzer_id: str, analyzer_func: Callable) -> None:
         """
-        Register a sentiment analyzer for testing
+        Register a sentiment analysis function for A/B testing.
         
         Args:
-            analyzer_id: Unique identifier for the analyzer
-            analyzer_func: Function that implements the sentiment analysis
+            analyzer_id (str): Unique identifier for the analyzer.
+            analyzer_func (Callable): Function to analyze sentiment.
         """
-        self.analyzers[analyzer_id] = analyzer_func
+        if not isinstance(analyzer_id, str):
+            raise ValueError("Analyzer ID must be a string")
+        
+        if not callable(analyzer_func):
+            raise ValueError("Analyzer must be a callable function")
+        
+        self.registered_analyzers[analyzer_id] = analyzer_func
         print(f"Registered sentiment analyzer: {analyzer_id}")
-    
+
     def create_sentiment_test(self, 
-                            test_id: str,
-                            description: str,
-                            analyzer_variants: List[Dict],
-                            data_sources: List[str],
-                            test_duration_days: int = 7,
-                            metrics: List[str] = None) -> Dict:
+                               test_description: str, 
+                               variants: List[Dict], 
+                               test_duration_days: int = 7) -> str:
         """
-        Create a new A/B test for sentiment analyzers
+        Create a new sentiment analysis A/B test.
         
         Args:
-            test_id: Unique identifier for the test
-            description: Test description
-            analyzer_variants: List of analyzer configurations to test
-            data_sources: List of data sources to test with (e.g., ['youtube', 'twitter'])
-            test_duration_days: Duration of the test in days
-            metrics: List of metrics to evaluate (defaults to standard sentiment metrics)
-            
-        Returns:
-            Dict containing the test configuration
-        """
-        # Default metrics if none provided
-        if metrics is None:
-            metrics = [
-                "accuracy", 
-                "correlation", 
-                "mae",
-                "precision_positive",
-                "recall_positive",
-                "f1_positive"
-            ]
+            test_description (str): Description of the test.
+            variants (List[Dict]): List of analyzer variants to test.
+            test_duration_days (int, optional): Duration of the test. Defaults to 7.
         
-        # Ensure each variant has an analyzer_id that exists
-        for variant in analyzer_variants:
-            if "analyzer_id" not in variant:
+        Returns:
+            str: Unique test ID
+        """
+        # Validate variants
+        for variant in variants:
+            if 'analyzer_id' not in variant:
                 raise ValueError(f"Each variant must specify an analyzer_id: {variant}")
             
-            if variant["analyzer_id"] not in self.analyzers:
+            if variant['analyzer_id'] not in self.registered_analyzers:
                 raise ValueError(f"Analyzer {variant['analyzer_id']} not registered")
-        
-        # Calculate end date
+
+        # Create test with start and end dates
         start_date = datetime.now().isoformat()
         end_date = (datetime.now() + timedelta(days=test_duration_days)).isoformat()
         
-        # Create test in the A/B framework
-        test = self.ab_framework.create_test(
-            test_id=test_id,
-            description=description,
-            variants=analyzer_variants,
-            metrics=metrics,
+        test_id = self.ab_framework.create_test(
+            test_id=f"sentiment_test_{datetime.now().strftime('%Y_%b')}",
+            description=test_description,
+            variants=variants,
             start_date=start_date,
-            end_date=end_date,
-            symbols=data_sources  # Reusing the symbols field for data sources
+            end_date=end_date
         )
         
-        return test
-    
+        return test_id
+
     def evaluate_on_labeled_data(self, 
-                                test_id: str,
-                                labeled_data: List[Dict],
-                                data_source: str) -> Dict:
+                                  test_id: str, 
+                                  data_source: str, 
+                                  labeled_data: List[Dict]) -> Dict:
         """
-        Evaluate all variants on a set of labeled data
+        Evaluate sentiment analyzers on labeled data.
         
         Args:
-            test_id: ID of the test to run
-            labeled_data: List of dictionaries containing text and true labels
-            data_source: Source of the labeled data (e.g., 'youtube', 'twitter')
-            
+            test_id (str): Unique identifier for the test.
+            data_source (str): Source of the labeled data.
+            labeled_data (List[Dict]): List of labeled sentiment data.
+        
         Returns:
-            Dict containing the evaluation results
+            Dict: Performance metrics for each analyzer variant
         """
-        if test_id not in self.ab_framework.tests:
+        # Validate test
+        test = self.ab_framework.get_test(test_id)
+        if not test:
             raise ValueError(f"Test with ID {test_id} not found")
-        
-        test = self.ab_framework.tests[test_id]
-        results = {}
-        
-        # Check if this data source is included in the test
-        if data_source not in test["symbols"]:
-            raise ValueError(f"Data source {data_source} not included in test {test_id}")
-        
-        # Evaluate each variant
-        for variant in test["variants"]:
-            variant_id = variant["id"]
-            analyzer_id = variant["analyzer_id"]
+
+        # Aggregate results per variant
+        result_metrics = {}
+        for variant in test['variants']:
+            analyzer_id = variant['analyzer_id']
+            analyzer_func = self.registered_analyzers.get(analyzer_id)
             
-            if analyzer_id not in self.analyzers:
+            if not analyzer_func:
                 print(f"Warning: Analyzer {analyzer_id} not found, skipping")
                 continue
-            
-            analyzer_func = self.analyzers[analyzer_id]
-            
-            # Configure the analyzer with variant parameters
-            analyzer_params = {k: v for k, v in variant.items() if k not in ["id", "analyzer_id"]}
-            
-            # Evaluate on labeled data
-            print(f"Evaluating variant {variant_id} on {data_source} data")
-            
+
+            # Collect performance metrics
             true_labels = []
             predicted_scores = []
-            
+
             for item in labeled_data:
                 text = item.get("text", "")
                 true_label = item.get("true_label", 0)
-                
-                # Skip if text is empty
-                if not text:
-                    continue
-                
-                # Apply the analyzer
+
+                # Apply analyzer with variant-specific parameters
+                analyzer_params = {k: v for k, v in variant.items() if k not in ["id", "analyzer_id"]}
                 analysis_result = analyzer_func(text, **analyzer_params)
+                
                 predicted_score = analysis_result.get("combined_score", 0)
                 
                 true_labels.append(true_label)
                 predicted_scores.append(predicted_score)
-            
-            # Calculate metrics
-            # We're reusing the sentiment metrics functionality from EnhancedPerformanceMetrics
-            from enhanced_performance_metrics import EnhancedPerformanceMetrics
+
+            # Calculate performance metrics
             perf_metrics = EnhancedPerformanceMetrics()
-            
             metrics = perf_metrics.update_sentiment_metrics(
-                source=data_source,
-                true_labels=true_labels,
-                predicted_scores=predicted_scores,
-                threshold=variant.get("threshold", 0.0),
-                period="test"
+                true_labels=true_labels, 
+                predicted_scores=predicted_scores
             )
-            
-            # Extract the metrics we want to record
-            result_metrics = {}
-            for metric in test["metrics"]:
-                if metric == "accuracy":
-                    result_metrics[metric] = metrics.get("accuracy", 0)
-                elif metric == "correlation":
-                    result_metrics[metric] = metrics.get("correlation", 0)
-                elif metric == "mae":
-                    result_metrics[metric] = metrics.get("mae", 0)
-                elif metric.startswith("precision_"):
-                    class_name = metric.split("_")[1]
-                    result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("precision", 0)
-                elif metric.startswith("recall_"):
-                    class_name = metric.split("_")[1]
-                    result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("recall", 0)
-                elif metric.startswith("f1_"):
-                    class_name = metric.split("_")[1]
-                    result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("f1_score", 0)
-            
-            # Record results in A/B framework
-            user_id = f"evaluation_{data_source}_{variant_id}"
-            self.ab_framework.record_result(
-                test_id=test_id,
-                user_id=user_id,
-                metrics=result_metrics,
-                symbol=data_source
-            )
-            
-            # Store in results dictionary
-            results[variant_id] = result_metrics
-        
-        # Analyze test
+
+            # Store results
+            result_metrics[analyzer_id] = {
+                "accuracy": metrics.get("accuracy", 0),
+                "correlation": metrics.get("correlation", 0),
+                "mae": metrics.get("mae", 0)
+            }
+
+        # Record results in A/B testing framework
+        self.ab_framework.record_result(
+            test_id=test_id,
+            variant_id=variant.get('id'),
+            metrics=result_metrics
+        )
+
+        # Analyze test results
         analysis = self.ab_framework.analyze_test(test_id)
-        
+
         return {
-            "results": results,
+            "results": result_metrics,
             "analysis": analysis
         }
-    
+
     def run_real_time_sentiment_test(self, 
-                                    test_id: str,
-                                    content_provider: Any,
-                                    manual_rating_callback: Callable = None,
-                                    days_per_variant: int = 2) -> None:
+                                     test_id: str, 
+                                     content_provider, 
+                                     days_per_variant: int = 7):
         """
-        Run a real-time test of sentiment analyzers on new content
+        Run a real-time sentiment analysis test across different variants.
         
         Args:
-            test_id: ID of the test to run
-            content_provider: Object that provides new content for analysis
-            manual_rating_callback: Optional function to get manual ratings for content
-            days_per_variant: Number of days to test each variant
+            test_id (str): Unique test identifier.
+            content_provider: Object providing streaming content and sentiment analysis.
+            days_per_variant (int, optional): Duration for each variant. Defaults to 7.
         """
-        if test_id not in self.ab_framework.tests:
-            raise ValueError(f"Test with ID {test_id} not found")
-        
-        test = self.ab_framework.tests[test_id]
-        
-        # Cycle through variants sequentially
-        for variant in test["variants"]:
-            variant_id = variant["id"]
-            analyzer_id = variant["analyzer_id"]
+        import time
+
+        # Validate test and variants
+        test = self.ab_framework.get_test(test_id)
+        if not test:
+            raise ValueError(f"Test {test_id} is not active")
+
+        # Process each variant
+        for variant in test['variants']:
+            analyzer_id = variant.get('analyzer_id')
+            analyzer_func = self.registered_analyzers.get(analyzer_id)
             
-            if analyzer_id not in self.analyzers:
+            if not analyzer_func:
                 print(f"Warning: Analyzer {analyzer_id} not found, skipping")
                 continue
-            
-            analyzer_func = self.analyzers[analyzer_id]
-            
-            # Configure the analyzer with variant parameters
+
+            # Variant-specific parameters
             analyzer_params = {k: v for k, v in variant.items() if k not in ["id", "analyzer_id"]}
             
-            # Set this analyzer as the active one in the content provider
-            print(f"Setting analyzer {analyzer_id} as active for variant {variant_id}")
+            # Set analyzer for content provider
             content_provider.set_analyzer(
                 lambda text: analyzer_func(text, **analyzer_params)
             )
-            
-            # Run for specified duration
-            print(f"Running real-time test for variant {variant_id} for {days_per_variant} days")
+
+            # Run test for specified duration
             start_time = datetime.now()
             end_time = start_time + timedelta(days=days_per_variant)
             
             while datetime.now() < end_time:
-                # Wait for the content provider to collect data
-                time.sleep(3600)  # Check every hour
-                
                 # Check if test is still active
-                if test_id not in self.ab_framework.tests or self.ab_framework.tests[test_id]["status"] != "active":
+                if not self.ab_framework.is_test_active(test_id):
                     print(f"Test {test_id} is no longer active, stopping real-time test")
                     break
-                
-                # Collect results if available
+
+                # Collect sentiment results periodically
                 if hasattr(content_provider, 'get_sentiment_results'):
                     results = content_provider.get_sentiment_results()
                     
                     for data_source, source_results in results.items():
-                        if data_source not in test["symbols"]:
-                            continue
-                        
-                        # Calculate metrics for this source
                         true_labels = source_results.get("true_labels", [])
                         predicted_scores = source_results.get("predicted_scores", [])
                         
-                        if not true_labels or not predicted_scores:
-                            continue
-                        
-                        # Calculate metrics
-                        from enhanced_performance_metrics import EnhancedPerformanceMetrics
-                        perf_metrics = EnhancedPerformanceMetrics()
-                        
-                        metrics = perf_metrics.update_sentiment_metrics(
-                            source=data_source,
-                            true_labels=true_labels,
-                            predicted_scores=predicted_scores,
-                            threshold=variant.get("threshold", 0.0),
-                            period="realtime"
-                        )
-                        
-                        # Extract the metrics we want to record
-                        result_metrics = {}
-                        for metric in test["metrics"]:
-                            if metric == "accuracy":
-                                result_metrics[metric] = metrics.get("accuracy", 0)
-                            elif metric == "correlation":
-                                result_metrics[metric] = metrics.get("correlation", 0)
-                            elif metric == "mae":
-                                result_metrics[metric] = metrics.get("mae", 0)
-                            elif metric.startswith("precision_"):
-                                class_name = metric.split("_")[1]
-                                result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("precision", 0)
-                            elif metric.startswith("recall_"):
-                                class_name = metric.split("_")[1]
-                                result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("recall", 0)
-                            elif metric.startswith("f1_"):
-                                class_name = metric.split("_")[1]
-                                result_metrics[metric] = metrics.get("class_metrics", {}).get(class_name, {}).get("f1_score", 0)
-                        
-                        # Record results in A/B framework
-                        timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
-                        user_id = f"realtime_{data_source}_{variant_id}_{timestamp}"
+                        # Record results
                         self.ab_framework.record_result(
                             test_id=test_id,
-                            user_id=user_id,
-                            metrics=result_metrics,
-                            symbol=data_source
+                            variant_id=variant.get('id'),
+                            metrics={
+                                "data_source": data_source,
+                                "true_labels": true_labels,
+                                "predicted_scores": predicted_scores
+                            }
                         )
-    
+
+                # Wait before next iteration
+                time.sleep(3600)  # Check every hour
+
     def get_best_sentiment_analyzer(self, test_id: str, primary_metric: str = "accuracy") -> Dict:
         """
-        Identify the best performing sentiment analyzer based on a primary metric
+        Determine the best sentiment analyzer based on test results.
         
         Args:
-            test_id: ID of the test to analyze
-            primary_metric: Primary metric to use for determining the best analyzer
-            
+            test_id (str): Unique test identifier.
+            primary_metric (str, optional): Metric to use for determining the best analyzer. 
+                                            Defaults to "accuracy".
+        
         Returns:
-            Dict containing the best analyzer configuration
+            Dict: Details of the best performing analyzer
         """
+        # Analyze test results
         analysis = self.ab_framework.analyze_test(test_id)
+        
+        # Find winning variant
         winner = analysis["winner"].get(primary_metric, {})
+        winning_variant = winner.get("variant", {})
         
-        if not winner:
-            return {
-                "status": "no_winner",
-                "message": f"No winner found for metric {primary_metric}"
-            }
-            
-        winning_variant_id = winner["variant_id"]
-        
-        # Find the winning variant configuration
-        test = self.ab_framework.tests[test_id]
-        winning_variant = None
-        for variant in test["variants"]:
-            if variant["id"] == winning_variant_id:
-                winning_variant = variant
-                break
-                
         if not winning_variant:
             return {
-                "status": "error",
-                "message": f"Winning variant {winning_variant_id} not found in test configuration"
+                "success": False,
+                "message": "No clear winner found in the test"
             }
-                
+
         return {
-            "status": "success",
-            "test_id": test_id,
-            "primary_metric": primary_metric,
-            "variant_id": winning_variant_id,
-            "analyzer_id": winning_variant["analyzer_id"],
+            "success": True,
+            "analyzer_id": winning_variant.get("analyzer_id"),
             "configuration": {k: v for k, v in winning_variant.items() if k not in ["id", "analyzer_id"]},
             "performance": {
                 metric: analysis["winner"].get(metric, {}).get("value", 0)
-                for metric in analysis["metrics_analyzed"]
+                for metric in analysis["winner"]
             }
         }
-    
+
     def implement_winning_analyzer(self, test_id: str, primary_metric: str = "accuracy") -> bool:
         """
-        Implement the winning sentiment analyzer in the production system
+        Implement the winning sentiment analyzer in production.
         
         Args:
-            test_id: ID of the test to analyze
-            primary_metric: Primary metric to use for determining the best analyzer
-            
+            test_id (str): Unique test identifier.
+            primary_metric (str, optional): Metric used to determine the best analyzer. 
+                                            Defaults to "accuracy".
+        
         Returns:
-            Boolean indicating success
+            bool: Whether implementation was successful
         """
-        # Get the best analyzer
         best_analyzer = self.get_best_sentiment_analyzer(test_id, primary_metric)
         
-        if best_analyzer["status"] != "success":
+        if not best_analyzer["success"]:
             print(f"Cannot implement winning analyzer: {best_analyzer['message']}")
             return False
-            
-        # Update the production configuration
-        analyzer_id = best_analyzer["analyzer_id"]
-        config = best_analyzer["configuration"]
-        
+
         try:
-            # This is where you would update your production configuration
-            # For example, saving to a configuration file
+            # Prepare production configuration
             production_config = {
-                "analyzer_id": analyzer_id,
-                "parameters": config,
-                "implemented_from_test": test_id,
+                "analyzer_id": best_analyzer["analyzer_id"],
                 "implemented_at": datetime.now().isoformat(),
                 "primary_metric": primary_metric,
-                "performance": best_analyzer["performance"]
+                "configuration": best_analyzer["configuration"]
             }
-            
-            # Save to a file
+
+            # Ensure production config directory exists
             os.makedirs("production_config", exist_ok=True)
+
+            # Save configuration
             with open("production_config/sentiment_analyzer_config.json", "w") as f:
                 json.dump(production_config, f, indent=2)
-                
-            print(f"Successfully implemented winning analyzer {analyzer_id} from test {test_id}")
+
+            print(f"Successfully implemented winning analyzer {best_analyzer['analyzer_id']} from test {test_id}")
             
             # End the test
             self.ab_framework.end_test(test_id)
             
             return True
-            
+
         except Exception as e:
             print(f"Error implementing winning analyzer: {str(e)}")
             return False

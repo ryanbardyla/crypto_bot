@@ -44,3 +44,23 @@
 2025-03-09 09:37:18,295 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
 2025-03-09 09:37:18,295 - AlertSystem - INFO - Alert state saved
 2025-03-09 09:37:18,295 - AlertSystem - INFO - Alert check complete. Found 0 alerts.
+2025-03-09 19:50:51,715 - AlertSystem - INFO - Configuration loaded successfully
+2025-03-09 19:50:51,726 - AlertSystem - INFO - Database connection established
+2025-03-09 19:50:51,726 - AlertSystem - INFO - Alert state loaded
+2025-03-09 19:50:51,726 - AlertSystem - INFO - Starting alert system with 60 minute interval
+2025-03-09 19:50:51,726 - AlertSystem - INFO - Checking for alert conditions...
+2025-03-09 19:50:51,728 - AlertSystem - WARNING - No sentiment data found in the last 24 hours
+2025-03-09 19:50:52,767 - multi_api_price_fetcher - ERROR - Error loading price history: 'CryptoPriceFetcher' object has no attribute 'data_file'
+2025-03-09 19:50:52,768 - multi_api_price_fetcher - INFO - Prometheus metrics server started on port 8001
+2025-03-09 19:50:52,875 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 19:50:52,875 - AlertSystem - ERROR - Error retrieving price data for BTC: 'NoneType' object is not iterable
+2025-03-09 19:50:52,876 - multi_api_price_fetcher - ERROR - Error loading price history: 'CryptoPriceFetcher' object has no attribute 'data_file'
+2025-03-09 19:50:52,876 - multi_api_price_fetcher - INFO - Metrics server already running on port 8001
+2025-03-09 19:50:52,877 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 19:50:52,877 - AlertSystem - ERROR - Error retrieving price data for ETH: 'NoneType' object is not iterable
+2025-03-09 19:50:52,877 - multi_api_price_fetcher - ERROR - Error loading price history: 'CryptoPriceFetcher' object has no attribute 'data_file'
+2025-03-09 19:50:52,878 - multi_api_price_fetcher - INFO - Metrics server already running on port 8001
+2025-03-09 19:50:52,879 - multi_api_price_fetcher - INFO - CryptoPriceFetcher initialized
+2025-03-09 19:50:52,879 - AlertSystem - ERROR - Error retrieving price data for SOL: 'NoneType' object is not iterable
+2025-03-09 19:50:52,879 - AlertSystem - INFO - Alert state saved
+2025-03-09 19:50:52,879 - AlertSystem - INFO - Alert check complete. Found 0 alerts.

@@ -1,0 +1,123 @@
+{
+  "vader_sentiment": {
+    "neg": 0.069,
+    "neu": 0.769,
+    "pos": 0.162,
+    "compound": 0.9999
+  },
+  "bullish_keywords": 15,
+  "bearish_keywords": 10,
+  "keyword_sentiment": 2.0,
+  "combined_score": 5.1996,
+  "mentioned_cryptos": [
+    "XRP",
+    "LINK",
+    "Bitcoin",
+    "Ethereum",
+    "Solana",
+    "Cardano",
+    "Dogecoin"
+  ],
+  "price_predictions": [
+    {
+      "crypto": "XRP",
+      "price": "2.7",
+      "timeframe": "these areas"
+    },
+    {
+      "crypto": "XRP",
+      "price": "2.7",
+      "timeframe": "these areas"
+    },
+    {
+      "crypto": "XRP",
+      "price": "2.7",
+      "timeframe": null
+    },
+    {
+      "crypto": "XRP",
+      "price": "2.7",
+      "timeframe": null
+    },
+    {
+      "crypto": "LINK",
+      "price": "10",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "70,000",
+      "timeframe": "Disguise why"
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "1",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "10,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "10,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "1",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "75,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "70,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "775,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Bitcoin",
+      "price": "770,000",
+      "timeframe": "fact hit"
+    },
+    {
+      "crypto": "Ethereum",
+      "price": "1,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Ethereum",
+      "price": "10,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Ethereum",
+      "price": "10,000",
+      "timeframe": null
+    },
+    {
+      "crypto": "Ethereum",
+      "price": "1",
+      "timeframe": null
+    },
+    {
+      "crypto": "Solana",
+      "price": "775,000",
+      "timeframe": null
+    }
+  ],
+  "text_length": 19165,
+  "source": "youtube-YufM4WjOnuM",
+  "timestamp": "2025-03-09 19:51:04",
+  "video_id": "YufM4WjOnuM",
+  "title": "CRYPTO CRASH! Why $70,000 Bitcoin is a GOOD Thing!"
+}

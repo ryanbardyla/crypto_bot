@@ -1,0 +1,21 @@
+{
+  "vader_sentiment": {
+    "neg": 0.029,
+    "neu": 0.778,
+    "pos": 0.193,
+    "compound": 0.9993
+  },
+  "bullish_keywords": 1,
+  "bearish_keywords": 4,
+  "keyword_sentiment": -6.0,
+  "combined_score": 0.39720000000000066,
+  "mentioned_cryptos": [
+    "Bitcoin"
+  ],
+  "price_predictions": [],
+  "text_length": 4149,
+  "source": "youtube-Z3oNaqiaFEo",
+  "timestamp": "2025-03-09 19:51:05",
+  "video_id": "Z3oNaqiaFEo",
+  "title": "Crypto Leaders Meet At White House ABC LIVE with Wendy O"
+}

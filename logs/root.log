@@ -30,3 +30,42 @@
 2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:77 - Stopping component: dashboard
 2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:99 - Component dashboard stopped
 2025-03-09 09:44:12 - CryptoBotController - INFO - crypto_bot_controller.py:126 - All components stopped
+2025-03-09 19:39:59 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 19:48:11 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 19:50:37 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 19:50:51 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:58 - Configuration loaded successfully
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:141 - Starting all components
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: youtube-tracker
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component youtube-tracker started in background with args: []
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: sentiment-ml
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component sentiment-ml started in background with args: ['--schedule']
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: price-fetcher
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component price-fetcher started in background with args: ['--auto']
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: alert-system
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component alert-system started in background with args: []
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: paper-trader
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component paper-trader started in background with args: ['--auto']
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: dashboard
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component dashboard started in background with args: []
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:75 - Starting component: performance-tracker
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:101 - Component performance-tracker started in background with args: []
+2025-03-09 19:50:51 - CryptoBotController - INFO - crypto_bot_controller.py:157 - All components started
+2025-03-09 19:52:15 - root - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:58 - Configuration loaded successfully
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:160 - Stopping all components
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: youtube-tracker
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component youtube-tracker stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: sentiment-ml
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component sentiment-ml stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: price-fetcher
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component price-fetcher stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: alert-system
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component alert-system stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: paper-trader
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component paper-trader stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: dashboard
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component dashboard stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:112 - Stopping component: performance-tracker
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:136 - Component performance-tracker stopped
+2025-03-09 19:52:15 - CryptoBotController - INFO - crypto_bot_controller.py:174 - All components stopped
