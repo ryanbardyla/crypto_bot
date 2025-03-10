@@ -10,7 +10,32 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multi_api_price_fetcher import CryptoPriceFetcher
 from database_manager import DatabaseManager
+from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Index
+from sqlalchemy.ext.declarative import declarative_base
 
+Base = declarative_base()
+
+class PriceHistory(Base):
+    __tablename__ = 'price_history'
+    
+    id = Column(Integer, primary_key=True)
+    symbol = Column(String(10), nullable=False, index=True)
+    timestamp = Column(DateTime, nullable=False, index=True)
+    price = Column(Float, nullable=False)
+    volume = Column(Float)
+    high = Column(Float)
+    low = Column(Float)
+    open = Column(Float)
+    close = Column(Float)
+    source = Column(String(50))
+    
+    __table_args__ = (
+        Index('idx_price_symbol_timestamp', symbol, timestamp),
+    )
+    
+    def __repr__(self):
+        return f"<PriceHistory(symbol='{self.symbol}', timestamp='{self.timestamp}', price={self.price})>"
+    
 class HistoricalDataCollector:
     """Collect historical cryptocurrency price data for backtesting"""
     
@@ -341,22 +366,71 @@ class HistoricalDataCollector:
         return df
     
     def update_price_history(self, symbol, df):
-        db_manager = DatabaseManager()
+    
+        db_manager = DatabaseManager(
+            host=os.environ.get("POSTGRES_HOST", "localhost"),
+            port=os.environ.get("POSTGRES_PORT", "5432"),
+            database=os.environ.get("POSTGRES_DB", "trading_db"),
+            user=os.environ.get("POSTGRES_USER", "bot_user"),
+            password=os.environ.get("POSTGRES_PASSWORD", "secure_password")
+        )
+    
         session = db_manager.get_session()
+        records_added = 0
+    
         try:
             for _, row in df.iterrows():
-                timestamp = row['timestamp']
+                # Convert timestamp to datetime if it's a string
+                if isinstance(row['timestamp'], str):
+                    timestamp = datetime.fromisoformat(row['timestamp'].replace('Z', '+00:00'))
+                else:
+                    timestamp = row['timestamp']
+                
                 price = float(row['price'])
+                
                 # Check if entry exists
-                existing = session.query(PriceHistory).filter_by(symbol=symbol, timestamp=timestamp).first()
-                if not existing:
-                    record = PriceHistory(symbol=symbol, timestamp=timestamp, price=price, source='historical')
+                existing = session.query(PriceHistory).filter_by(
+                    symbol=symbol, 
+                    timestamp=timestamp
+                ).first()
+                
+                if existing:
+                    # Update existing record
+                    existing.price = price
+                    if 'volume' in row:
+                        existing.volume = float(row.get('volume', 0))
+                    if 'high' in row:
+                        existing.high = float(row.get('high', price))
+                    if 'low' in row:
+                        existing.low = float(row.get('low', price))
+                    if 'open' in row:
+                        existing.open = float(row.get('open', price))
+                    if 'close' in row:
+                        existing.close = float(row.get('close', price))
+                    existing.source = 'historical'
+                else:
+                    # Create new record
+                    record = PriceHistory(
+                        symbol=symbol,
+                        timestamp=timestamp,
+                        price=price,
+                        volume=float(row.get('volume', 0)) if 'volume' in row else None,
+                        high=float(row.get('high', price)) if 'high' in row else None,
+                        low=float(row.get('low', price)) if 'low' in row else None,
+                        open=float(row.get('open', price)) if 'open' in row else None,
+                        close=float(row.get('close', price)) if 'close' in row else None,
+                        source='historical'
+                    )
                     session.add(record)
+                    records_added += 1
+                    
             session.commit()
-            print(f"Updated price history for {symbol} in database")
+            print(f"Updated price history for {symbol} in database: {records_added} new records")
+            return records_added
         except Exception as e:
             session.rollback()
             print(f"Error updating database: {e}")
+            return 0
         finally:
             session.close()
     
