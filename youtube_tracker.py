@@ -14,6 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 from crypto_sentiment_analyzer import CryptoSentimentAnalyzer
+from database_manager import DatabaseManager
 
 # Import the centralized logging configuration
 from utils.logging_config import get_module_logger
@@ -97,15 +98,15 @@ class SentimentRecord(Base):
 
 class YouTubeTracker:
     def __init__(self, config_file="youtube_tracker_config.json"):
-        # Track active workers for metrics
-        self.active_workers = 0
-        ACTIVE_WORKERS.set(self.active_workers)
-        
-        # Load configuration and set up components
+        self.db_manager = DatabaseManager()
         self.load_config(config_file)
         self.setup_youtube_api()
         self.setup_database()
         self.sentiment_analyzer = CryptoSentimentAnalyzer()
+
+    def setup_database(self):
+        Base.metadata.create_all(self.db_manager.engine)
+        self.Session = sessionmaker(bind=self.db_manager.engine)
         self.rate_limiter = RateLimiter(calls_per_second=0.5)  # YouTube API has quotas
         
         # Initialize executor with worker tracking

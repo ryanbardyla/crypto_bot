@@ -1,0 +1,2 @@
+2025-03-09 20:32:47 - retry_utility - ERROR - retry_utility.py:275 - Non-retryable exception in _fetch_from_api: Data extraction error with kraken API: 'result'
+2025-03-09 20:35:23 - retry_utility - ERROR - retry_utility.py:275 - Non-retryable exception in _fetch_from_api: Data extraction error with kraken API: 'result'

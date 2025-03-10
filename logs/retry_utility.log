@@ -1,0 +1,10 @@
+2025-03-09 20:31:05 - retry_utility - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:31:19 - retry_utility - DEBUG - retry_utility.py:76 - Initialized circuit breaker 'price_api' with threshold=5, timeout=60
+2025-03-09 20:32:46 - retry_utility - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:32:46 - retry_utility - DEBUG - retry_utility.py:76 - Initialized circuit breaker 'price_api' with threshold=5, timeout=60
+2025-03-09 20:32:47 - retry_utility - ERROR - retry_utility.py:275 - Non-retryable exception in _fetch_from_api: Data extraction error with kraken API: 'result'
+2025-03-09 20:35:22 - retry_utility - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:22 - retry_utility - DEBUG - retry_utility.py:76 - Initialized circuit breaker 'price_api' with threshold=5, timeout=60
+2025-03-09 20:35:23 - retry_utility - ERROR - retry_utility.py:275 - Non-retryable exception in _fetch_from_api: Data extraction error with kraken API: 'result'
+2025-03-09 20:35:50 - retry_utility - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:56 - retry_utility - DEBUG - retry_utility.py:76 - Initialized circuit breaker 'price_api' with threshold=5, timeout=60

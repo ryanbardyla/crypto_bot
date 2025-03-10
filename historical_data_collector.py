@@ -9,6 +9,7 @@ import os
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from multi_api_price_fetcher import CryptoPriceFetcher
+from database_manager import DatabaseManager
 
 class HistoricalDataCollector:
     """Collect historical cryptocurrency price data for backtesting"""
@@ -340,37 +341,24 @@ class HistoricalDataCollector:
         return df
     
     def update_price_history(self, symbol, df):
-        """
-        Update price history with new data points
-        Integrates with the existing price history format
-        """
-        history = self.load_history()
-        
-        # Initialize entry for this symbol if needed
-        if symbol not in history:
-            history[symbol] = []
-        
-        # Convert DataFrame rows to history format
-        for _, row in df.iterrows():
-            timestamp = row['timestamp'].strftime('%Y-%m-%d %H:%M:%S')
-            price = float(row['price'])
-            
-            # Add to history if this timestamp doesn't exist
-            existing_timestamps = [entry['timestamp'] for entry in history[symbol]]
-            if timestamp not in existing_timestamps:
-                history[symbol].append({
-                    'timestamp': timestamp,
-                    'price': price,
-                    'source': 'historical'
-                })
-        
-        # Sort by timestamp
-        history[symbol] = sorted(history[symbol], key=lambda x: x['timestamp'])
-        
-        # Save updated history
-        self.save_history(history)
-        
-        return len(history[symbol])
+        db_manager = DatabaseManager()
+        session = db_manager.get_session()
+        try:
+            for _, row in df.iterrows():
+                timestamp = row['timestamp']
+                price = float(row['price'])
+                # Check if entry exists
+                existing = session.query(PriceHistory).filter_by(symbol=symbol, timestamp=timestamp).first()
+                if not existing:
+                    record = PriceHistory(symbol=symbol, timestamp=timestamp, price=price, source='historical')
+                    session.add(record)
+            session.commit()
+            print(f"Updated price history for {symbol} in database")
+        except Exception as e:
+            session.rollback()
+            print(f"Error updating database: {e}")
+        finally:
+            session.close()
     
     def collect_data(self, symbol, days=30, use_synthetic=False):
         """

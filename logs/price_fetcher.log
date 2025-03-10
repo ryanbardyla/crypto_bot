@@ -1,0 +1,113 @@
+2025-03-09 20:31:06 - price_fetcher - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:31:06 - price_fetcher - INFO - multi_api_price_fetcher.py:383 - No price history file found at data/price_history.json, creating new history
+2025-03-09 20:31:06 - price_fetcher - INFO - multi_api_price_fetcher.py:339 - Prometheus metrics server started on port 8001
+2025-03-09 20:31:06 - price_fetcher - INFO - multi_api_price_fetcher.py:331 - EnhancedPriceFetcher initialized
+2025-03-09 20:31:19 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching BTC price from coinbase API...
+2025-03-09 20:31:19 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored BTC price: $80419.99 from coinbase
+2025-03-09 20:31:19 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched BTC price from coinbase: $80419.99
+2025-03-09 20:31:57 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from coinbase API...
+2025-03-09 20:31:57 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored ETH price: $2005.20 from coinbase
+2025-03-09 20:31:57 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched ETH price from coinbase: $2005.20
+2025-03-09 20:32:00 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching SOL price from binance API...
+2025-03-09 20:32:00 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored SOL price: $125.53 from binance
+2025-03-09 20:32:00 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched SOL price from binance: $125.53
+2025-03-09 20:32:05 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching DOGE price from binance API...
+2025-03-09 20:32:05 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored DOGE price: $0.17 from binance
+2025-03-09 20:32:05 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched DOGE price from binance: $0.17
+2025-03-09 20:32:07 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ADA price from coingecko API...
+2025-03-09 20:32:07 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored ADA price: $0.72 from coingecko
+2025-03-09 20:32:07 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched ADA price from coingecko: $0.72
+2025-03-09 20:32:17 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:32:17 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:32:46 - price_fetcher - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:383 - No price history file found at data/price_history.json, creating new history
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:339 - Prometheus metrics server started on port 8001
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:331 - EnhancedPriceFetcher initialized
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:900 - Starting automatic price updates for ['BTC', 'ETH'] every 300 seconds
+2025-03-09 20:32:46 - price_fetcher - DEBUG - multi_api_price_fetcher.py:126 - Rate limiting coinbase, waiting 0.33s
+2025-03-09 20:32:46 - price_fetcher - DEBUG - multi_api_price_fetcher.py:126 - Rate limiting kraken, waiting 0.98s
+2025-03-09 20:32:46 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching BTC price from coinbase API...
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored BTC price: $80258.07 from coinbase
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched BTC price from coinbase: $80258.07
+2025-03-09 20:32:46 - price_fetcher - INFO - multi_api_price_fetcher.py:819 - Updated BTC price: $80258.07
+2025-03-09 20:32:47 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from kraken API...
+2025-03-09 20:32:47 - price_fetcher - WARNING - multi_api_price_fetcher.py:628 - Error with kraken API: Unexpected response format - missing key 'result'
+2025-03-09 20:32:47 - price_fetcher - WARNING - multi_api_price_fetcher.py:717 - Failed to fetch ETH price from kraken: Data extraction error with kraken API: 'result'
+2025-03-09 20:32:47 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from coinbase API...
+2025-03-09 20:32:47 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored ETH price: $2004.74 from coinbase
+2025-03-09 20:32:47 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched ETH price from coinbase: $2004.74
+2025-03-09 20:32:47 - price_fetcher - INFO - multi_api_price_fetcher.py:819 - Updated ETH price: $2004.74
+2025-03-09 20:32:47 - price_fetcher - INFO - multi_api_price_fetcher.py:910 - Updated BTC price: $80258.07
+2025-03-09 20:32:47 - price_fetcher - INFO - multi_api_price_fetcher.py:910 - Updated ETH price: $2004.74
+2025-03-09 20:34:49 - price_fetcher - INFO - multi_api_price_fetcher.py:918 - Price fetcher stopped by user
+2025-03-09 20:34:49 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:34:50 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:35:22 - price_fetcher - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:383 - No price history file found at data/price_history.json, creating new history
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:339 - Prometheus metrics server started on port 8001
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:331 - EnhancedPriceFetcher initialized
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:900 - Starting automatic price updates for ['BTC', 'ETH', 'SOL'] every 300 seconds
+2025-03-09 20:35:22 - price_fetcher - DEBUG - multi_api_price_fetcher.py:126 - Rate limiting kraken, waiting 0.98s
+2025-03-09 20:35:22 - price_fetcher - DEBUG - multi_api_price_fetcher.py:126 - Rate limiting coinbase, waiting 0.32s
+2025-03-09 20:35:22 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching BTC price from coinbase API...
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored BTC price: $80108.45 from coinbase
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched BTC price from coinbase: $80108.45
+2025-03-09 20:35:22 - price_fetcher - INFO - multi_api_price_fetcher.py:819 - Updated BTC price: $80108.45
+2025-03-09 20:35:23 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from kraken API...
+2025-03-09 20:35:23 - price_fetcher - DEBUG - multi_api_price_fetcher.py:126 - Rate limiting kraken, waiting 1.00s
+2025-03-09 20:35:23 - price_fetcher - WARNING - multi_api_price_fetcher.py:628 - Error with kraken API: Unexpected response format - missing key 'result'
+2025-03-09 20:35:23 - price_fetcher - WARNING - multi_api_price_fetcher.py:717 - Failed to fetch ETH price from kraken: Data extraction error with kraken API: 'result'
+2025-03-09 20:35:23 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from coinbase API...
+2025-03-09 20:35:23 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored ETH price: $1998.88 from coinbase
+2025-03-09 20:35:23 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched ETH price from coinbase: $1998.88
+2025-03-09 20:35:23 - price_fetcher - INFO - multi_api_price_fetcher.py:819 - Updated ETH price: $1998.88
+2025-03-09 20:35:24 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching SOL price from kraken API...
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored SOL price: $124.46 from kraken
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched SOL price from kraken: $124.46
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:819 - Updated SOL price: $124.46
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:910 - Updated BTC price: $80108.45
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:910 - Updated ETH price: $1998.88
+2025-03-09 20:35:24 - price_fetcher - INFO - multi_api_price_fetcher.py:910 - Updated SOL price: $124.46
+2025-03-09 20:35:43 - price_fetcher - INFO - multi_api_price_fetcher.py:918 - Price fetcher stopped by user
+2025-03-09 20:35:43 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:35:44 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:35:50 - price_fetcher - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:50 - price_fetcher - INFO - multi_api_price_fetcher.py:383 - No price history file found at data/price_history.json, creating new history
+2025-03-09 20:35:50 - price_fetcher - INFO - multi_api_price_fetcher.py:339 - Prometheus metrics server started on port 8001
+2025-03-09 20:35:50 - price_fetcher - INFO - multi_api_price_fetcher.py:331 - EnhancedPriceFetcher initialized
+2025-03-09 20:35:56 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching ETH price from coinbase API...
+2025-03-09 20:35:56 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored ETH price: $1999.60 from coinbase
+2025-03-09 20:35:56 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched ETH price from coinbase: $1999.60
+2025-03-09 20:36:04 - price_fetcher - DEBUG - multi_api_price_fetcher.py:577 - Fetching SOL price from binance API...
+2025-03-09 20:36:04 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored SOL price: $124.32 from binance
+2025-03-09 20:36:04 - price_fetcher - INFO - multi_api_price_fetcher.py:713 - Successfully fetched SOL price from binance: $124.32
+2025-03-09 20:36:08 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - binance API doesn't support LINL, skipping...
+2025-03-09 20:36:08 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coinbase API doesn't support LINL, skipping...
+2025-03-09 20:36:08 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - kraken API doesn't support LINL, skipping...
+2025-03-09 20:36:08 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coingecko API doesn't support LINL, skipping...
+2025-03-09 20:36:08 - price_fetcher - WARNING - multi_api_price_fetcher.py:721 - All APIs failed, falling back to mock data.
+2025-03-09 20:36:08 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored LINL price: $1009.59 from mock_data
+2025-03-09 20:36:08 - price_fetcher - INFO - multi_api_price_fetcher.py:531 - Using mock data for LINL: $1009.5888353597404 (reason: api_failure)
+2025-03-09 20:36:13 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coinbase API doesn't support LINK, skipping...
+2025-03-09 20:36:13 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - binance API doesn't support LINK, skipping...
+2025-03-09 20:36:13 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coingecko API doesn't support LINK, skipping...
+2025-03-09 20:36:13 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - kraken API doesn't support LINK, skipping...
+2025-03-09 20:36:13 - price_fetcher - WARNING - multi_api_price_fetcher.py:721 - All APIs failed, falling back to mock data.
+2025-03-09 20:36:13 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored LINK price: $1001.90 from mock_data
+2025-03-09 20:36:13 - price_fetcher - INFO - multi_api_price_fetcher.py:531 - Using mock data for LINK: $1001.8968323784887 (reason: api_failure)
+2025-03-09 20:36:16 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - kraken API doesn't support BABA, skipping...
+2025-03-09 20:36:16 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coingecko API doesn't support BABA, skipping...
+2025-03-09 20:36:16 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - binance API doesn't support BABA, skipping...
+2025-03-09 20:36:16 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coinbase API doesn't support BABA, skipping...
+2025-03-09 20:36:16 - price_fetcher - WARNING - multi_api_price_fetcher.py:721 - All APIs failed, falling back to mock data.
+2025-03-09 20:36:16 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored BABA price: $1001.36 from mock_data
+2025-03-09 20:36:16 - price_fetcher - INFO - multi_api_price_fetcher.py:531 - Using mock data for BABA: $1001.3564905895067 (reason: api_failure)
+2025-03-09 20:36:32 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - kraken API doesn't support CHAIN, skipping...
+2025-03-09 20:36:32 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coinbase API doesn't support CHAIN, skipping...
+2025-03-09 20:36:32 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - coingecko API doesn't support CHAIN, skipping...
+2025-03-09 20:36:32 - price_fetcher - DEBUG - multi_api_price_fetcher.py:696 - binance API doesn't support CHAIN, skipping...
+2025-03-09 20:36:32 - price_fetcher - WARNING - multi_api_price_fetcher.py:721 - All APIs failed, falling back to mock data.
+2025-03-09 20:36:32 - price_fetcher - INFO - multi_api_price_fetcher.py:503 - Stored CHAIN price: $1007.40 from mock_data
+2025-03-09 20:36:32 - price_fetcher - INFO - multi_api_price_fetcher.py:531 - Using mock data for CHAIN: $1007.3964098047019 (reason: api_failure)
+2025-03-09 20:36:55 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed
+2025-03-09 20:36:55 - price_fetcher - INFO - multi_api_price_fetcher.py:852 - EnhancedPriceFetcher closed

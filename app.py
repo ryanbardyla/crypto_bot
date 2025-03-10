@@ -1,7 +1,6 @@
 # app.py
 import os
 import json
-import sqlite3
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -9,14 +8,15 @@ from datetime import datetime, timedelta
 from dash import Dash, html, dcc, callback, Output, Input
 from dash.dependencies import Input, Output, State
 from sqlalchemy import create_engine, text
+from database_manager import DatabaseManager
 
 # Initialize the Dash app
 app = Dash(__name__, external_stylesheets=['https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css'])
 app.title = "Crypto Sentiment Dashboard"
 
-# Database connection
-DB_PATH = "sqlite:///sentiment_database.db"
-engine = create_engine(DB_PATH)
+db_manager = DatabaseManager()
+engine = db_manager.engine
+app = Dash(__name__, external_stylesheets=['...'])
 
 # Helper function to get cutoff date based on time range
 def get_cutoff_date(time_range):

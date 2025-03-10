@@ -49,7 +49,8 @@ class SentimentRecord(Base):
     )
 
 class DatabaseManager:
-    def __init__(self, db_path="sqlite:///sentiment_database.db", enable_pooling=True):
+    # Updated db_path to use PostgreSQL
+    def __init__(self, db_path="postgresql://bot_user:secure_password@localhost:5432/trading_db", enable_pooling=True):
         self.db_path = db_path
         self.enable_pooling = enable_pooling
         self.setup_database()
@@ -295,12 +296,16 @@ class DatabaseManager:
         logger.info(f"Migration completed: {success_count} successes, {failed_count} failures")
         return success_count, failed_count
     
+    # Updated to handle SQLite-specific VACUUM command
     def vacuum_database(self):
         """Optimize the database by vacuuming (SQLite specific)."""
         try:
-            with self.engine.connect() as conn:
-                conn.execute("VACUUM")
-            logger.info("Database vacuumed successfully")
+            if self.engine.dialect.name == 'sqlite':
+                with self.engine.connect() as conn:
+                    conn.execute("VACUUM")
+                logger.info("Database vacuumed successfully")
+            else:
+                logger.info("VACUUM not applicable for this database type")
             return True
         except Exception as e:
             logger.error(f"Error vacuuming database: {str(e)}")

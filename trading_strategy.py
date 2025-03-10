@@ -13,6 +13,7 @@ from sqlalchemy import create_engine, text
 from scipy.stats import pearsonr
 from sklearn.preprocessing import MinMaxScaler
 import pika
+from database_manager import DatabaseManager
 
 # Set up logging
 logging.basicConfig(
@@ -27,10 +28,14 @@ logger = logging.getLogger("TradingStrategy")
 
 class TradingStrategy:
     def __init__(self, config_file="trading_strategy_config.json", use_rabbitmq=False):
-        self.use_rabbitmq = use_rabbitmq
         self.load_config(config_file)
+        self.db_manager = DatabaseManager()
         self.setup_database()
+        self.use_rabbitmq = use_rabbitmq
         
+    def setup_database(self):
+        self.engine = self.db_manager.engine  # Use if direct engine access is needed
+
         # Setup RabbitMQ connection if enabled
         if self.use_rabbitmq:
             try:

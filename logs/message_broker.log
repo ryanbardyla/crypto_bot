@@ -1,0 +1,4 @@
+2025-03-09 20:31:05 - message_broker - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:32:46 - message_broker - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:22 - message_broker - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
+2025-03-09 20:35:50 - message_broker - DEBUG - logging_config.py:82 - Logging configured: console=20, file=10
