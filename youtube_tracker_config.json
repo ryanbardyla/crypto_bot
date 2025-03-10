@@ -47,5 +47,5 @@
     },
     "check_interval_hours": 24,
     "video_age_limit_days": 30,
-    "db_path": "sqlite:///sentiment_database.db"
+    "use_env_for_db": true
 }

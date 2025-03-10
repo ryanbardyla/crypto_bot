@@ -1,5 +1,5 @@
 {
-  "discord_webhook_url": "https://discord.com/api/webhooks/1340815824725868646/iAhNLuuSWL3aUvnSeJtNWohCjGFkd87vae2m4eikkcVnXbF2SFN0yjvKz0cgEMCkZzFj",
+  "discord_webhook_url": "",
   "sentiment_shift_threshold": 2.0,
   "extreme_sentiment_threshold": 5.0,
   "price_divergence_threshold": 3.0,
@@ -14,5 +14,4 @@
     "ETH",
     "SOL"
   ],
-  "use_env_for_db": true
-}
+  "db_path":

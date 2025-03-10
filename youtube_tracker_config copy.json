@@ -1,0 +1,6 @@
+{
+    "channel_ids": [],
+    "channel_names": {},
+    "check_interval_hours": 24,
+    "video_age_limit_days": 30,
+    "db_path":
